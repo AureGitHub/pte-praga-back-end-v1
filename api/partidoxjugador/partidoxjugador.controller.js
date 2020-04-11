@@ -33,6 +33,13 @@ exports.partidoxjugadorController = {
     // const suplentes = await db.raw(sql, partido.id);
   },
 
+  getAure: async function(idpartido) {
+    return genericController.getAll(tablename, 'id', {
+      idpartido,
+      idpartidoxjugador_estado: 1,
+    });
+  },
+
   getAceptados: async function(idpartido) {
     return genericController.getAll(tablename, 'id', {
       idpartido,
