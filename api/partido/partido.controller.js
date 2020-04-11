@@ -7,6 +7,7 @@ const {
 } = require('../partidoxjugador/partidoxjugador.controller');
 
 exports.getAll = async ctx => {
+  let { userInToken } = ctx.state;
   const sql = `select 
   p.id,
   p.idcreador,
@@ -18,10 +19,13 @@ exports.getAll = async ctx => {
   p.jugadoresapuntados,
   pj.id as idpartidoxjugador
   from partido p
-  left join partidoxjugador pj on p.id = pj.idpartido 
+  left join partidoxjugador pj on p.id = pj.idpartido and pj.idjugador = ?
   order by p.id desc`;
-  let data = await db.raw(sql);
-  data = data.rows;
+  let data = await genericController.getAllquery(
+    sql,
+    userInToken ? userInToken.id : -1,
+  );
+
   ctx.status = 200;
   ctx.body = { data };
 };

@@ -16,10 +16,8 @@ function applyApiMiddleware(app) {
   fs.readdirSync(__dirname)
     .filter(file => file.indexOf('.') !== 0 && file !== baseName)
     .forEach(file => {
-      try {
-        const api = require(path.join(__dirname, file))(Router);
-        router.use(api.routes());
-      } catch (err) {} // si falla es porque no tiene controller. No hago nada
+      const api = require(path.join(__dirname, file))(Router);
+      router.use(api.routes());
     });
 
   app.use(router.routes()).use(router.allowedMethods());

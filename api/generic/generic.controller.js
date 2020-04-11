@@ -45,7 +45,16 @@ exports.genericController = {
         .from(table)
         .where(where);
     }
-
     return items;
+  },
+
+  getAllquery: async function(sql, parmans) {
+    let data = null;
+    if (parmans) {
+      data = await db.raw(sql, parmans);
+    } else {
+      data = await db.raw(sql);
+    }
+    return data.rows;
   },
 };
