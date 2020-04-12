@@ -2,7 +2,7 @@ const jsonwebtoken = require('jsonwebtoken');
 var { SessionTime, JWT_SECRET, KeySecure } = require('../config');
 const { enumPerfil } = require('./enum.util');
 
-exports.generate = async user => {
+exports.generate = async (ctx, user) => {
   user.IsAdmin = user.idperfil === enumPerfil.admin;
   user.IsJugador = user.idperfil === enumPerfil.jugador;
 
@@ -15,7 +15,9 @@ exports.generate = async user => {
   );
   let caduca = new Date();
   caduca = new Date(caduca.setMinutes(caduca.getMinutes() + 30));
-  return { user: userWithoutidperfil, token, caduca };
+  ctx.set(`${KeySecure}-user`, JSON.stringify(userWithoutidperfil));
+  ctx.set(`${KeySecure}-token`, `Bearer ${token}`);
+  ctx.set(`${KeySecure}-caduca`, JSON.stringify(caduca));
 };
 
 exports.refresh = async ctx => {
@@ -28,7 +30,9 @@ exports.refresh = async ctx => {
       let token = await jsonwebtoken.sign({ data, exp }, JWT_SECRET);
       let caduca = new Date();
       caduca = new Date(caduca.setMinutes(caduca.getMinutes() + 30));
-      return { user: data, token, caduca };
+      ctx.set(`${KeySecure}-user`, JSON.stringify(data));
+      ctx.set(`${KeySecure}-token`, `Bearer ${token}`);
+      ctx.set(`${KeySecure}-caduca`, JSON.stringify(caduca));
     }
   } catch (err) {
     // err NO hago nada... si ha llegado hasta aquí con un token erróneo, es porque está

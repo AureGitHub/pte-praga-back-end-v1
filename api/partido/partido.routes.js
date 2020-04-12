@@ -7,8 +7,8 @@ module.exports = Router => {
 
   router
     .get('/', controller.getAll)
-    .get('/:id', controller.getOne)
     .get('/public', controller.getAll)
+    .get('/:id', controller.getOne)
     .post('/', controller.createOne)
     .put('/', controller.updateOne);
   return router;

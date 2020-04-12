@@ -27,10 +27,9 @@ exports.login = async ctx => {
 
   if (await compare(password, dbUser.passwordhash)) {
     const { passwordhash, ...userWithoutPass } = dbUser;
-    let { user, token, caduca } = await generate(userWithoutPass);
-    let dataUser = { user, token, caduca };
+    await generate(ctx, userWithoutPass);
     ctx.status = 200;
-    ctx.body = { dataUser };
+    ctx.body = 'Credenciales correctas';
   } else {
     ctx.throw(401, 'Credenciales incorrectas.');
   }

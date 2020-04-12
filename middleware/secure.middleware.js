@@ -14,11 +14,7 @@ var secureEntrada = async (ctx, next) => {
 };
 var secureSalida = async (ctx, next) => {
   console.log('sale');
-  let dataUser = await refresh(ctx);
-  // en el login y publico será null
-  if (dataUser && ctx.body) {
-    ctx.body['dataUser'] = dataUser;
-  }
+  await refresh(ctx);
 };
 module.exports = async (ctx, next) => {
   await secureEntrada(ctx, next);
