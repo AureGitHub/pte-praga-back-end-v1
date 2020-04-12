@@ -64,6 +64,12 @@ exports.getOne = async function getOne(ctx) {
 
 exports.createOne = async function createOne(ctx) {
   const NewPartido = ctx.request.body;
+  const { idcreador, dia, duracion, pistas } = ctx.request.body;
+  assertKOParams(ctx, idcreador, 'idcreador');
+  assertKOParams(ctx, dia, 'dia');
+  assertKOParams(ctx, duracion, 'duracion');
+  assertKOParams(ctx, pistas, 'pistas');
+
   NewPartido.jugadorestotal = parseInt(NewPartido.pistas) * 4;
   delete NewPartido.id;
   NewPartido.jugadoresapuntados = 0;
