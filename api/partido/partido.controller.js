@@ -1,17 +1,17 @@
 'use strict';
 
 const db = require('../../database');
-const { genericController } = require('../../database/generic.controller');
-const {
-  partidoxjugadorController,
-} = require('../partidoxjugador/partidoxjugador.controller');
+const controller = require('../index.controller');
 
 const {
+  statusCreate,
   statusOKquery,
   statusOKSave,
   assertNoData,
   assertKOParams,
 } = require('../../utils/error.util');
+
+const { enumPartidoEstado } = require('../../utils/enum.util');
 
 const tablename = 'partido';
 
@@ -30,7 +30,7 @@ exports.getAll = async ctx => {
   from partido p
   left join partidoxjugador pj on p.id = pj.idpartido and pj.idjugador = ?
   order by p.id desc`;
-  let data = await genericController.getAllquery(
+  let data = await controller.generic.getAllquery(
     sql,
     userInToken ? userInToken.id : -1,
   );
@@ -56,7 +56,7 @@ exports.getOne = async function getOne(ctx) {
   from partido p
   where id=?`;
 
-  let data = await genericController.getOnequery(sql, id);
+  let data = await controller.generic.getOnequery(sql, id);
   assertNoData(ctx, data);
   ctx.status = statusOKquery;
   ctx.body = { data };
@@ -80,8 +80,28 @@ exports.createOne = async function createOne(ctx) {
 
   NewPartido['id'] = accessBD[0];
 
-  ctx.status = statusOKSave;
+  ctx.status = statusCreate;
   ctx.body = { data: NewPartido };
+};
+
+exports.deleteOne = async function deleteOne(ctx) {
+  const { id } = ctx.params;
+  assertKOParams(ctx, id, 'id');
+
+  let nDel = 0;
+  await db.transaction(async function(trx) {
+    try {
+      await controller.paxpixma.delByIdpartido(id, trx);
+      await controller.paxpi.delByIdpartido(id, trx);
+      await controller.paxpa.delByIdpartido(id, trx);
+      await controller.paxju.delByIdpartido(id, trx);
+      nDel = await controller.generic.delByWhere(tablename, { id }, trx);
+    } catch (err) {
+      await ctx.throw(401, err.message);
+    }
+  });
+  ctx.status = statusOKSave;
+  ctx.body = { data: nDel === 1 };
 };
 
 var gestionSuplentes = async (oldPartido, partido, trx) => {
@@ -90,7 +110,7 @@ var gestionSuplentes = async (oldPartido, partido, trx) => {
     const cuantosSuplentesAscientes =
       (parseInt(partido.pistas) - parseInt(oldPartido.pistas)) * 4;
 
-    await partidoxjugadorController.SuplentesAceptados(
+    await controller.paxju.SuplentesAceptados(
       trx,
       partido.id,
       cuantosSuplentesAscientes,
@@ -98,7 +118,7 @@ var gestionSuplentes = async (oldPartido, partido, trx) => {
   } else if (parseInt(oldPartido.pistas) > parseInt(partido.pistas)) {
     // pasar Aceptados a suplentes
     // order descendente. LIFO
-    await partidoxjugadorController.AceptadosSuplentes(
+    await controller.paxju.AceptadosSuplentes(
       trx,
       partido.id,
       parseInt(partido.pistas) * 4,
@@ -134,14 +154,29 @@ exports.updateOne = async function updateOne(ctx) {
 
   partido.jugadorestotal = parseInt(partido.pistas) * 4;
   await db.transaction(async function(trx) {
-    await genericController.delByIdpartido('partidoxpistaxmarcador', id, trx);
-    await genericController.delByIdpartido('partidoxpista', id, trx);
-    await genericController.delByIdpartido('partidoxpareja', id, trx);
+    await controller.paxpixma.delByIdpartido(id, trx);
+    await controller.paxpi.delByIdpartido(id, trx);
+    await controller.paxpa.delByIdpartido(id, trx);
     await gestionSuplentes(oldPartido, partido, trx);
-    await genericController.updateOne(tablename, { id: partido.id }, partido);
+    await controller.generic.updateOne(tablename, { id: partido.id }, partido);
     // await trx('partido')
     //   .where({ id: partido.id })
     //   .update(partido);
+  });
+
+  ctx.status = statusOKSave;
+  ctx.body = { data: partido };
+};
+
+exports.finalizaOne = async ctx => {
+  const partido = ctx.request.body;
+  const { id } = partido;
+  partido.idpartido_estado = enumPartidoEstado.finalizado;
+  assertKOParams(ctx, id, 'id');
+
+  await db.transaction(async function(trx) {
+    await controller.generic.updateOne(tablename, { id }, partido);
+    controller.paxpixra.updateFinalizaOne(trx, id);
   });
 
   ctx.status = statusOKSave;

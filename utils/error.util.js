@@ -4,7 +4,9 @@ exports.errNoData = errNoData;
 const statusNoData = 404;
 exports.statusNoData = statusNoData;
 exports.statusOKquery = 200;
-exports.statusOKSave = 201;
+exports.statusOKSave = 200;
+
+exports.statusCreate = 201;
 
 const statusKOParams = 404;
 

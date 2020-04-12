@@ -6,7 +6,7 @@ const Router = require('koa-router');
 
 const { apiVersion } = require('../config').server;
 const baseName = path.basename(__filename);
-
+const baseNameController = 'index.controller.js';
 function applyApiMiddleware(app) {
   const router = new Router({
     prefix: `/api/ver${apiVersion}`,
@@ -14,7 +14,12 @@ function applyApiMiddleware(app) {
 
   // Require all the folders and create a sub-router for each feature api
   fs.readdirSync(__dirname)
-    .filter(file => file.indexOf('.') !== 0 && file !== baseName)
+    .filter(
+      file =>
+        file.indexOf('.') !== 0 &&
+        file !== baseName &&
+        file !== baseNameController,
+    )
     .forEach(file => {
       const api = require(path.join(__dirname, file))(Router);
       router.use(api.routes());

@@ -10,6 +10,7 @@ const {
   errorHandler,
   secureHandler,
   errorjwtHandler,
+  nofoundHandler,
 } = require('./middleware');
 const applyApiMiddleware = require('./api');
 const { isDevelopment, JWT_SECRET } = require('./config');
@@ -39,5 +40,5 @@ server
   .use(bodyParser);
 
 applyApiMiddleware(server);
-
+server.use(nofoundHandler);
 module.exports = server;

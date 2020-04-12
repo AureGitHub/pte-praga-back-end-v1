@@ -5,19 +5,22 @@ const { enumPerfil } = require('./enum.util');
 exports.generate = async (ctx, user) => {
   user.IsAdmin = user.idperfil === enumPerfil.admin;
   user.IsJugador = user.idperfil === enumPerfil.jugador;
-
   const { idperfil, ...userWithoutidperfil } = user;
 
   let exp = Math.floor(Date.now() / 1000) + SessionTime * 60;
+
   let token = await jsonwebtoken.sign(
     { data: userWithoutidperfil, exp },
     JWT_SECRET,
   );
+
   let caduca = new Date();
-  caduca = new Date(caduca.setMinutes(caduca.getMinutes() + 30));
+  caduca = new Date(caduca.setMinutes(caduca.getMinutes() + SessionTime));
+  let caducaStr = caduca.toString();
+
   ctx.set(`${KeySecure}-user`, JSON.stringify(userWithoutidperfil));
   ctx.set(`${KeySecure}-token`, `Bearer ${token}`);
-  ctx.set(`${KeySecure}-caduca`, JSON.stringify(caduca));
+  ctx.set(`${KeySecure}-caduca`, caducaStr);
 };
 
 exports.refresh = async ctx => {
@@ -26,13 +29,7 @@ exports.refresh = async ctx => {
     if (tokenInHeader) {
       tokenInHeader = tokenInHeader.replace('Bearer ', '');
       var { data } = jsonwebtoken.verify(tokenInHeader, JWT_SECRET);
-      let exp = Math.floor(Date.now() / 1000) + SessionTime * 60;
-      let token = await jsonwebtoken.sign({ data, exp }, JWT_SECRET);
-      let caduca = new Date();
-      caduca = new Date(caduca.setMinutes(caduca.getMinutes() + 30));
-      ctx.set(`${KeySecure}-user`, JSON.stringify(data));
-      ctx.set(`${KeySecure}-token`, `Bearer ${token}`);
-      ctx.set(`${KeySecure}-caduca`, JSON.stringify(caduca));
+      await this.generate(ctx, data);
     }
   } catch (err) {
     // err NO hago nada... si ha llegado hasta aquí con un token erróneo, es porque está

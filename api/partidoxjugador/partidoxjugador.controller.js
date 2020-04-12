@@ -3,7 +3,10 @@ const { genericController } = require('../../database/generic.controller');
 
 const tablename = 'partidoxjugador';
 
-exports.partidoxjugadorController = {
+exports.paxjuController = {
+  delByIdpartido: async function(idpartido, trx) {
+    await genericController.delByWhere(tablename, { idpartido }, trx);
+  },
   deleteOne: async function(id, trx = null) {
     if (trx) {
       await trx('partidoxpista')

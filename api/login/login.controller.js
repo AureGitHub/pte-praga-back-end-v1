@@ -32,7 +32,7 @@ exports.login = async ctx => {
     const { passwordhash, ...userWithoutPass } = dbUser;
     await generate(ctx, userWithoutPass);
     ctx.status = 200;
-    ctx.body = 'Credenciales correctas';
+    ctx.body = { data: true };
   } else {
     ctx.throw(401, 'Credenciales incorrectas.');
   }

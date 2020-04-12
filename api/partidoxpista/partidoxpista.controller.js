@@ -1,10 +1,30 @@
 const db = require('../../database');
 const { genericController } = require('../../database/generic.controller');
 const {
-  partidoxpistaxmarcadorController,
+  paxpixmaController,
 } = require('../partidoxpistaxmarcador/partidoxpistaxmarcador.controller');
 
 const { statusOKSave, assertKOParams } = require('../../utils/error.util');
+
+const tablename = 'partidoxpista';
+
+exports.paxpiController = {
+  deleteOne: async (id, trx = null) => {
+    if (trx) {
+      await trx('partidoxpista')
+        .where({ id })
+        .del();
+    } else {
+      await db('partidoxpista')
+        .where({ id })
+        .del();
+    }
+  },
+
+  delByIdpartido: async function(idpartido, trx) {
+    await genericController.delByWhere(tablename, { idpartido }, trx);
+  },
+};
 
 // old getpartidoxpistaByIdpartido
 exports.getAllByIdpartido = async ctx => {
@@ -33,9 +53,7 @@ exports.getAllByIdpartido = async ctx => {
   const data = await genericController.getAllquery(sql, [idpartido]);
 
   // todos los marcadores de todos los partidos del partido
-  const marcadores = await partidoxpistaxmarcadorController.getAllByIdpartido(
-    idpartido,
-  );
+  const marcadores = await paxpixmaController.getAllByIdpartido(idpartido);
 
   data.forEach(element => {
     let susMarcadores = marcadores.filter(
@@ -51,30 +69,4 @@ exports.getAllByIdpartido = async ctx => {
 
   ctx.status = statusOKSave;
   ctx.body = { data };
-};
-
-exports.partidoxmarcadorController = {
-  deleteOne: async (id, trx = null) => {
-    if (trx) {
-      await trx('partidoxpista')
-        .where({ id })
-        .del();
-    } else {
-      await db('partidoxpista')
-        .where({ id })
-        .del();
-    }
-  },
-
-  deleteOneByIdpartido: async (idpartido, trx = null) => {
-    if (trx) {
-      await trx('partidoxpista')
-        .where({ idpartido })
-        .del();
-    } else {
-      await db('partidoxpista')
-        .where({ idpartido })
-        .del();
-    }
-  },
 };

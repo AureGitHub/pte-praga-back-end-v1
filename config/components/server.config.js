@@ -30,7 +30,7 @@ const config = {
   tag_private: 'PRIVATE',
   KeySecure: 'authorization',
   JWT_SECRET: '30421687313841dzxcSSwWWXXa',
-  SessionTime: 60,
+  SessionTime: 180,
   server: {
     port: envVars.PORT || 3000,
     apiVersion: envVars.API_VERSION || 'v1',

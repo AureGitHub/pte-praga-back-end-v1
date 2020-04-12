@@ -10,6 +10,12 @@ module.exports = Router => {
     .get('/public', controller.getAll)
     .get('/:id', controller.getOne)
     .post('/', controller.createOne)
-    .put('/', controller.updateOne);
+    .delete('/:id', controller.deleteOne)
+    .put('/', controller.updateOne)
+    .put('/finaliza', controller.finalizaOne);
   return router;
 };
+
+/*
+router.get('/partidos_cierre/:id'  ==> Desaparece : se debe utilizar updateOne!!!!
+*/

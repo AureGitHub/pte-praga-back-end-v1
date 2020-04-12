@@ -2,15 +2,17 @@ const db = require('.');
 
 exports.genericController = {
   deletegeneric: async function(table, where, trx = null) {
+    let delRet = null;
     if (trx) {
-      await trx(table)
+      delRet = await trx(table)
         .where(where)
         .del();
     } else {
-      await db(table)
+      delRet = await db(table)
         .where(where)
         .del();
     }
+    return delRet;
   },
 
   updateOne: async function(table, where, item, trx = null) {
@@ -25,11 +27,22 @@ exports.genericController = {
     }
   },
 
-  deleteById: async function(table, id, trx = null) {
-    await this.deletegeneric(table, { id }, trx);
+  createOne: async function(table, item, trx = null) {
+    if (trx) {
+      const getBD = await trx(table)
+        .insert(item)
+        .returning('id');
+      item['id'] = getBD[0];
+    } else {
+      const getBD = await db(table)
+        .insert(item)
+        .returning('id');
+      item['id'] = getBD[0];
+    }
   },
-  delByIdpartido: async function(table, idpartido, trx = null) {
-    await this.deletegeneric(table, { idpartido }, trx);
+
+  delByWhere: async function(table, where, trx = null) {
+    return this.deletegeneric(table, where, trx);
   },
   getAll: async function(table, colums, where, orderBy = null) {
     var items = null;
@@ -44,6 +57,19 @@ exports.genericController = {
         .select(colums)
         .from(table)
         .where(where);
+    }
+    return items;
+  },
+
+  getAllSinWhere: async function(table, colums, orderBy = null) {
+    var items = null;
+    if (orderBy) {
+      items = await db
+        .select(colums)
+        .from(table)
+        .orderBy(orderBy);
+    } else {
+      items = await db.select(colums).from(table);
     }
     return items;
   },
