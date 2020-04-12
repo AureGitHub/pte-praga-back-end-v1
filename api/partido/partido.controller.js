@@ -42,7 +42,7 @@ exports.getAll = async ctx => {
 // old getById
 exports.getOne = async function getOne(ctx) {
   const id = ctx.params.id;
-  await assertKOParams(ctx, id, 'id');
+  assertKOParams(ctx, id, 'id');
 
   const sql = `select 
   p.id,
@@ -57,7 +57,7 @@ exports.getOne = async function getOne(ctx) {
   where id=?`;
 
   let data = await genericController.getOnequery(sql, id);
-  await assertNoData(ctx, data);
+  assertNoData(ctx, data);
   ctx.status = statusOKquery;
   ctx.body = { data };
 };
@@ -106,11 +106,11 @@ exports.updateOne = async function updateOne(ctx) {
   const partido = ctx.request.body;
   const { id, idcreador, dia, duracion, pistas } = ctx.request.body;
 
-  await assertKOParams(ctx, id, 'id');
-  await assertKOParams(ctx, idcreador, 'idcreador');
-  await assertKOParams(ctx, dia, 'dia');
-  await assertKOParams(ctx, duracion, 'duracion');
-  await assertKOParams(ctx, pistas, 'pistas');
+  assertKOParams(ctx, id, 'id');
+  assertKOParams(ctx, idcreador, 'idcreador');
+  assertKOParams(ctx, dia, 'dia');
+  assertKOParams(ctx, duracion, 'duracion');
+  assertKOParams(ctx, pistas, 'pistas');
 
   // seguridad
   ctx.assert(
@@ -124,7 +124,7 @@ exports.updateOne = async function updateOne(ctx) {
     .where({ id });
 
   const message = `no se ecuentra el partido con id ${id}`;
-  await assertNoData(ctx, oldPartido, message);
+  assertNoData(ctx, oldPartido, message);
 
   partido.jugadorestotal = parseInt(partido.pistas) * 4;
   await db.transaction(async function(trx) {

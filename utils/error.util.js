@@ -8,7 +8,7 @@ exports.statusOKSave = 201;
 
 const statusKOParams = 404;
 
-exports.assertNoData = async (ctx, data, message = null) => {
+exports.assertNoData = (ctx, data, message = null) => {
   if (message) {
     ctx.assert(data, statusNoData, `${message} (${ctx.url}, ${ctx.method})`);
   } else {
@@ -20,7 +20,7 @@ exports.assertNoData = async (ctx, data, message = null) => {
   }
 };
 
-exports.assertKOParams = async (ctx, data, paramName) => {
+exports.assertKOParams = (ctx, data, paramName) => {
   ctx.assert(
     data,
     statusKOParams,

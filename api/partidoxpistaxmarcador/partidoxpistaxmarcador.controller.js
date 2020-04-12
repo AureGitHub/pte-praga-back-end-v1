@@ -21,7 +21,7 @@ exports.partidoxpistaxmarcadorController = partidoxpistaxmarcadorController;
 
 exports.getAllByIdpartido = async ctx => {
   const { idpartido } = ctx.params;
-  await assertKOParams(ctx, idpartido, 'idpartido');
+  assertKOParams(ctx, idpartido, 'idpartido');
 
   const data = await partidoxpistaxmarcadorController.getAllByIdpartido(
     idpartido,

@@ -6,7 +6,7 @@ const { statusOKquery, assertKOParams } = require('../../utils/error.util');
 exports.getAllByIdpartido = async ctx => {
   const { idpartido } = ctx.params;
 
-  await assertKOParams(ctx, idpartido, 'idpartido');
+  assertKOParams(ctx, idpartido, 'idpartido');
 
   const sql = `
   select drive.alias drive, reves.alias reves, sum(gana) ganados, sum(juegos) juegos

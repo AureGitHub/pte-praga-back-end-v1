@@ -5,10 +5,13 @@ const db = require('../../database');
 let { generate } = require('../../utils/token.util');
 let { compare } = require('../../utils/bcrypt.util');
 
+let { assertKOParams } = require('../../utils/error.util');
+
 exports.login = async ctx => {
   const { email, password } = ctx.request.body;
-  ctx.assert(email, 404, 'Debe indicar email');
-  ctx.assert(password, 404, 'Debe indicar password');
+
+  assertKOParams(ctx, email, 'email');
+  assertKOParams(ctx, password, 'password');
 
   const dbUser = await db
     .first([

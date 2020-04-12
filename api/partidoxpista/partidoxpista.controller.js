@@ -10,7 +10,7 @@ const { statusOKSave, assertKOParams } = require('../../utils/error.util');
 exports.getAllByIdpartido = async ctx => {
   const { idpartido } = ctx.params;
 
-  await assertKOParams(ctx, idpartido, 'idpartido');
+  assertKOParams(ctx, idpartido, 'idpartido');
   const sql = `select 
   pxpi.id,
   pxpi.nombre,
