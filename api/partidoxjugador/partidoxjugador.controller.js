@@ -1,5 +1,5 @@
 const db = require('../../database');
-const { genericController } = require('../generic/generic.controller');
+const { genericController } = require('../../database/generic.controller');
 
 const tablename = 'partidoxjugador';
 
@@ -24,13 +24,6 @@ exports.partidoxjugadorController = {
     // .orderBy('idpartidoxpista', 'idset');
 
     return items.rows;
-
-    // const sql = `select
-    // pj.id
-    // from partidoxjugador pj
-    // where idpartido=? and idpartidoxjugador_estado=2
-    // order by pj.created_at`;
-    // const suplentes = await db.raw(sql, partido.id);
   },
 
   getAceptados: async function(idpartido) {

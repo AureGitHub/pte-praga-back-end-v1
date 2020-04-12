@@ -3,8 +3,6 @@ let { refresh, getData } = require('../utils/token.util');
 var secureEntrada = async (ctx, next) => {
   // ctx.throw(500,'Error Message');
 
-  var url = ctx.url;
-
   // ctx.assert(false, 401, 'No está autorizado para realizar esta operación');
   let userInToken = await getData(ctx);
   // en el login y publico será null

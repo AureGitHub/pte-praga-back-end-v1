@@ -1,15 +1,16 @@
 const db = require('../../database');
-const { genericController } = require('../generic/generic.controller');
+const { genericController } = require('../../database/generic.controller');
 const {
   partidoxpistaxmarcadorController,
 } = require('../partidoxpistaxmarcador/partidoxpistaxmarcador.controller');
+
+const { statusOKSave, assertKOParams } = require('../../utils/error.util');
 
 // old getpartidoxpistaByIdpartido
 exports.getAllByIdpartido = async ctx => {
   const { idpartido } = ctx.params;
 
-  ctx.assert(idpartido, 404, 'La petición no es correcta (idpartido)');
-
+  await assertKOParams(ctx, idpartido, 'idpartido');
   const sql = `select 
   pxpi.id,
   pxpi.nombre,
@@ -48,7 +49,7 @@ exports.getAllByIdpartido = async ctx => {
     // element['marcador'] = marcadores.filter(a=> a.idpartidoxpista === element.id);
   });
 
-  ctx.status = 200;
+  ctx.status = statusOKSave;
   ctx.body = { data };
 };
 

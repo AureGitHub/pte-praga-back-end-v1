@@ -1,4 +1,5 @@
-const { genericController } = require('../generic/generic.controller');
+const { genericController } = require('../../database/generic.controller');
+const { statusOKSave, assertKOParams } = require('../../utils/error.util');
 const tablename = 'partidoxpistaxmarcador';
 exports.prefix = `/${tablename}`;
 
@@ -20,10 +21,11 @@ exports.partidoxpistaxmarcadorController = partidoxpistaxmarcadorController;
 
 exports.getAllByIdpartido = async ctx => {
   const { idpartido } = ctx.params;
-  ctx.assert(idpartido, 404, 'La petición no es correcta (idpartido)');
+  await assertKOParams(ctx, idpartido, 'idpartido');
+
   const data = await partidoxpistaxmarcadorController.getAllByIdpartido(
     idpartido,
   );
-  ctx.status = 200;
+  ctx.status = statusOKSave;
   ctx.body = { data };
 };

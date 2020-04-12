@@ -1,10 +1,12 @@
 // const db = require('../../database');
-const { genericController } = require('../generic/generic.controller');
+const { genericController } = require('../../database/generic.controller');
+const { statusOKquery, assertKOParams } = require('../../utils/error.util');
+
 // old getpartidoxpistaxrankingByIdpartido
 exports.getAllByIdpartido = async ctx => {
   const { idpartido } = ctx.params;
 
-  ctx.assert(idpartido, 404, 'La petición no es correcta (idpartido)');
+  await assertKOParams(ctx, idpartido, 'idpartido');
 
   const sql = `
   select drive.alias drive, reves.alias reves, sum(gana) ganados, sum(juegos) juegos
@@ -16,6 +18,6 @@ exports.getAllByIdpartido = async ctx => {
   order by ganados desc, juegos desc`;
 
   const data = await genericController.getAllquery(sql, [idpartido]);
-  ctx.status = 200;
+  ctx.status = statusOKquery;
   ctx.body = { data };
 };
