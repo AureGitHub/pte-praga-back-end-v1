@@ -1,3 +1,4 @@
+const { enumType } = require('./enum.util');
 let errNoData = new Error('no hay datos para la consulta solicitada');
 errNoData.status = 404;
 exports.errNoData = errNoData;
@@ -22,7 +23,16 @@ exports.assertNoData = (ctx, data, message = null) => {
   }
 };
 
-exports.assertKOParams = (ctx, data, paramName) => {
+exports.assertKOParams = (ctx, data, paramName, type = null) => {
+  if (type === enumType.number) {
+    ctx.assert(
+      !isNaN(data),
+      statusKOParams,
+      `La petición no es correcta. El parámetro debe ser numérico (${ctx.url}, 
+          ${ctx.method},  ${paramName})`,
+    );
+  }
+
   ctx.assert(
     data,
     statusKOParams,

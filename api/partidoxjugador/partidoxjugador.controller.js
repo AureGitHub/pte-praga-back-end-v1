@@ -1,9 +1,30 @@
 const db = require('../../database');
 const { genericController } = require('../../database/generic.controller');
-
+const { enumType } = require('../../utils/enum.util');
 const tablename = 'partidoxjugador';
+const {
+  statusCreate,
+  statusOKquery,
+  statusOKSave,
+  assertNoData,
+  assertKOParams,
+} = require('../../utils/error.util');
 
-exports.paxjuController = {
+exports.getAll = async ctx => {
+  const data = await paxjuController.getAll();
+  ctx.status = statusOKquery;
+  ctx.body = { data };
+};
+
+exports.getOne = async ctx => {
+  const id = ctx.params.id;
+  assertKOParams(ctx, id, 'id', enumType.number);
+  const data = await genericController.getOne(tablename, '*', { id });
+  ctx.status = statusOKquery;
+  ctx.body = { data };
+};
+
+var paxjuController = {
   delByIdpartido: async function(idpartido, trx) {
     await genericController.delByWhere(tablename, { idpartido }, trx);
   },
@@ -19,14 +40,8 @@ exports.paxjuController = {
     }
   },
 
-  getAll: async function(where, trx = null) {
-    var items = await db
-      .select('id')
-      .from('partidoxjugador')
-      .where(where);
-    // .orderBy('idpartidoxpista', 'idset');
-
-    return items.rows;
+  getAll: async function() {
+    return genericController.getAllSinWhere(tablename, '*');
   },
 
   getAceptados: async function(idpartido) {
@@ -68,3 +83,4 @@ exports.paxjuController = {
     }
   },
 };
+exports.paxjuController = paxjuController;

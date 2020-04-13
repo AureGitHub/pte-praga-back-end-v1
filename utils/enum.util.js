@@ -20,3 +20,7 @@ exports.enumJugadorEstado = {
   bloqueado: 3,
   activo: 4,
 };
+
+exports.enumType = {
+  number: 1,
+};

@@ -81,7 +81,12 @@ exports.genericController = {
     } else {
       data = await db.raw(sql);
     }
-    return data.rows[0];
+    return data.rows[0] ? data.rows[0] : 0;
+  },
+
+  getOne: async function(table, colums, where) {
+    let data = await this.getAll(table, colums, where);
+    return data[0] ? data[0] : null;
   },
 
   getAllquery: async function(sql, parmans) {
