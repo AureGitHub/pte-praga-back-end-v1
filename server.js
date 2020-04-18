@@ -1,7 +1,7 @@
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser')();
 const compress = require('koa-compress')();
-const cors = require('@koa/cors')(/* Add your cors option */);
+const cors = require('@koa/cors');
 const helmet = require('koa-helmet')(/* Add your security option */);
 const logger = require('koa-logger')();
 var jwt = require('koa-jwt');
@@ -17,13 +17,6 @@ const { isDevelopment, JWT_SECRET } = require('./config');
 
 const server = new Koa();
 
-server.use(errorjwtHandler);
-
-var unprotected = [/\/public/, /\/login/, /favicon.ico/];
-server.use(jwt({ secret: JWT_SECRET }).unless({ path: unprotected }));
-/**
- * Add here only development middlewares
- */
 if (isDevelopment) {
   console.log('modo desarrollo');
   server.use(logger);
@@ -31,13 +24,22 @@ if (isDevelopment) {
   console.log('modo NO desarrollo');
 }
 
+server.use(cors());
+
+server.use(errorjwtHandler);
+
+var unprotected = [/\/public/, /\/login/, /favicon.ico/];
+server.use(jwt({ secret: JWT_SECRET }).unless({ path: unprotected }));
+/**
+ * Add here only development middlewares
+ */
+
 server
-  .use(secureHandler)
-  .use(errorHandler)
   .use(helmet)
   .use(compress)
-  .use(cors)
-  .use(bodyParser);
+  .use(bodyParser)
+  .use(secureHandler)
+  .use(errorHandler);
 
 applyApiMiddleware(server);
 server.use(nofoundHandler);

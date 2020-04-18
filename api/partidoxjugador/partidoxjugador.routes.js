@@ -7,7 +7,7 @@ module.exports = Router => {
   const router = new Router({ prefix });
 
   router.get('/', controller.getAll);
-  router.get('/:id', controller.getOne);
-
+  // router.get('/:id', controller.getOne);
+  router.get('/:idpartido', controller.getAllByIdpartido);
   return router;
 };

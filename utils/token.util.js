@@ -1,26 +1,26 @@
 const jsonwebtoken = require('jsonwebtoken');
 var { SessionTime, JWT_SECRET, KeySecure } = require('../config');
-const { enumPerfil } = require('./enum.util');
 
 exports.generate = async (ctx, user) => {
-  user.IsAdmin = user.idperfil === enumPerfil.admin;
-  user.IsJugador = user.idperfil === enumPerfil.jugador;
-  const { idperfil, ...userWithoutidperfil } = user;
-
   let exp = Math.floor(Date.now() / 1000) + SessionTime * 60;
 
-  let token = await jsonwebtoken.sign(
-    { data: userWithoutidperfil, exp },
-    JWT_SECRET,
-  );
+  let token = jsonwebtoken.sign({ data: user, exp }, JWT_SECRET);
+  token = `Bearer ${token}`;
 
-  let caduca = new Date();
-  caduca = new Date(caduca.setMinutes(caduca.getMinutes() + SessionTime));
-  let caducaStr = caduca.toString();
+  let expire = new Date();
+  expire = new Date(expire.setMinutes(expire.getMinutes() + SessionTime));
+  // let caducaStr = caduca.toString();
 
-  ctx.set(`${KeySecure}-user`, JSON.stringify(userWithoutidperfil));
-  ctx.set(`${KeySecure}-token`, `Bearer ${token}`);
-  ctx.set(`${KeySecure}-caduca`, caducaStr);
+  if (!ctx.body) {
+    ctx.body = {};
+  }
+  ctx.body[KeySecure] = { user, token, expire };
+
+  ctx.set(`${KeySecure}`, JSON.stringify({ user, token, expire }));
+
+  // ctx.set(`${KeySecure}-user`, JSON.stringify(userWithoutidperfil));
+  // ctx.set(`${KeySecure}-token`, `Bearer ${token}`);
+  // ctx.set(`${KeySecure}-caduca`, caducaStr);
 };
 
 exports.refresh = async ctx => {

@@ -24,6 +24,28 @@ exports.getOne = async ctx => {
   ctx.body = { data };
 };
 
+exports.getAllByIdpartido = async ctx => {
+  const { idpartido } = ctx.params;
+
+  assertKOParams(ctx, idpartido, 'idpartido');
+  const sql = `select 
+  j.id,
+  j.alias,
+  j.idposicion ,
+  pj.idpartidoxjugador_estado
+  from partidoxjugador pj
+  inner join jugador j on pj.idjugador = j.id    
+  where idpartido=?
+  order by pj.created_at`;
+
+  const data = await genericController.getAllquery(sql, [idpartido]);
+
+  // todos los marcadores de todos los partidos del partido
+
+  ctx.status = statusOKSave;
+  ctx.body = { data };
+};
+
 var paxjuController = {
   delByIdpartido: async function(idpartido, trx) {
     await genericController.delByWhere(tablename, { idpartido }, trx);

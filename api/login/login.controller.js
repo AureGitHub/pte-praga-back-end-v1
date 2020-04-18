@@ -7,6 +7,8 @@ let { compare } = require('../../utils/bcrypt.util');
 
 let { assertKOParams } = require('../../utils/error.util');
 
+const { enumPerfil } = require('../../utils/enum.util');
+
 exports.login = async ctx => {
   const { email, password } = ctx.request.body;
 
@@ -29,10 +31,12 @@ exports.login = async ctx => {
   ctx.assert(dbUser, 404, 'Credenciales incorrectas');
 
   if (await compare(password, dbUser.passwordhash)) {
+    dbUser.IsAdmin = dbUser.idperfil === enumPerfil.admin;
+    dbUser.IsJugador = dbUser.idperfil === enumPerfil.jugador;
     const { passwordhash, ...userWithoutPass } = dbUser;
-    await generate(ctx, userWithoutPass);
     ctx.status = 200;
     ctx.body = { data: true };
+    await generate(ctx, userWithoutPass);
   } else {
     ctx.throw(401, 'Credenciales incorrectas.');
   }
