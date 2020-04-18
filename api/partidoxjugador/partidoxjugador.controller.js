@@ -3,10 +3,8 @@ const { genericController } = require('../../database/generic.controller');
 const { enumType } = require('../../utils/enum.util');
 const tablename = 'partidoxjugador';
 const {
-  statusCreate,
   statusOKquery,
   statusOKSave,
-  assertNoData,
   assertKOParams,
 } = require('../../utils/error.util');
 
