@@ -6,8 +6,10 @@ const prefix = `/partidoxjugador`;
 module.exports = Router => {
   const router = new Router({ prefix });
 
-  router.get('/', controller.getAll);
-  // router.get('/:id', controller.getOne);
-  router.get('/:idpartido', controller.getAllByIdpartido);
+  router
+    .get('/', controller.getAll)
+    .get('/:idpartido', controller.getAllByIdpartido)
+    .post('/', controller.createOne)
+    .delete('/:id', controller.deleteOne);
   return router;
 };

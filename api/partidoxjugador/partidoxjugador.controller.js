@@ -1,15 +1,21 @@
 const db = require('../../database');
-const { genericController } = require('../../database/generic.controller');
+const busOwn = require('./bussines');
+const busPartido = require('../partido/bussines');
+const buspaxpixma = require('../partidoxpistaxmarcador/bussines');
+const buspaxpi = require('../partidoxpista/bussines');
+const buspaxpa = require('../partidoxpareja/bussines');
+
 const { enumType } = require('../../utils/enum.util');
-const tablename = 'partidoxjugador';
+
 const {
+  statusCreate,
   statusOKquery,
   statusOKSave,
   assertKOParams,
 } = require('../../utils/error.util');
 
 exports.getAll = async ctx => {
-  const data = await paxjuController.getAll();
+  const data = await busOwn.getAll();
   ctx.status = statusOKquery;
   ctx.body = { data };
 };
@@ -17,90 +23,76 @@ exports.getAll = async ctx => {
 exports.getOne = async ctx => {
   const id = ctx.params.id;
   assertKOParams(ctx, id, 'id', enumType.number);
-  const data = await genericController.getOne(tablename, '*', { id });
+  const data = await busOwn.getOne(id);
   ctx.status = statusOKquery;
   ctx.body = { data };
 };
 
 exports.getAllByIdpartido = async ctx => {
   const { idpartido } = ctx.params;
-
   assertKOParams(ctx, idpartido, 'idpartido');
-  const sql = `select 
-  j.id,
-  j.alias,
-  j.idposicion ,
-  pj.idpartidoxjugador_estado
-  from partidoxjugador pj
-  inner join jugador j on pj.idjugador = j.id    
-  where idpartido=?
-  order by pj.created_at`;
-
-  const data = await genericController.getAllquery(sql, [idpartido]);
-
-  // todos los marcadores de todos los partidos del partido
-
+  const data = await busOwn.getAllByIdpartido(idpartido);
   ctx.status = statusOKSave;
   ctx.body = { data };
 };
 
-var paxjuController = {
-  delByIdpartido: async function(idpartido, trx) {
-    await genericController.delByWhere(tablename, { idpartido }, trx);
-  },
-  deleteOne: async function(id, trx = null) {
-    if (trx) {
-      await trx('partidoxpista')
-        .where({ id })
-        .del();
-    } else {
-      await db('partidoxpista')
-        .where({ id })
-        .del();
-    }
-  },
+exports.createOne = async function createOne(ctx) {
+  let item = ctx.request.body;
+  const { idpartido, idjugador } = item;
+  assertKOParams(ctx, idpartido, 'idpartido', enumType.number);
+  assertKOParams(ctx, idjugador, 'idjugador', enumType.number);
 
-  getAll: async function() {
-    return genericController.getAllSinWhere(tablename, '*');
-  },
+  const jugadorestotal = await busPartido.getTotalJugadores(idpartido);
+  const jugadoresAceptados = await busOwn.getAceptadosCount(idpartido);
 
-  getAceptados: async function(idpartido) {
-    return genericController.getAll(tablename, 'id', {
-      idpartido,
-      idpartidoxjugador_estado: 1,
-    });
-  },
+  item['idpartidoxjugador_estado'] = busOwn.SetEstado(
+    jugadorestotal,
+    jugadoresAceptados,
+  );
 
-  getSupentes: async function(idpartido) {
-    return genericController.getAll(tablename, 'id', {
-      idpartido,
-      idpartidoxjugador_estado: 1,
-    });
-  },
+  await db.transaction(async function(trx) {
+    await busOwn.createOne(item);
+    await busPartido.IncrementOne(idpartido, 1, trx);
+  });
 
-  SuplentesAceptados: async function(trx, idpartido, cuantos) {
-    const suplentes = await this.getSupentes(idpartido);
-    // como mucho, todos los suplentes que hay
-    const LosQuePasan = cuantos > suplentes.length ? suplentes.length : cuantos;
-    for (let index = 0; index < LosQuePasan; index++) {
-      if (suplentes[index]) {
-        const { id } = suplentes[index];
-        const toUpdate = { idpartidoxjugador_estado: 1 };
-        await genericController.updateOne(tablename, { id }, toUpdate, trx);
-      }
-    }
-  },
-
-  AceptadosSuplentes: async function(trx, idpartido, TotalPuedenJugar) {
-    const aceptados = await this.getAceptados(idpartido);
-    const cuantosAceptadosDescienden = aceptados.length - TotalPuedenJugar;
-    for (let index = 0; index < cuantosAceptadosDescienden; index++) {
-      if (aceptados[index]) {
-        const { id } = aceptados[index];
-        const toUpdate = { idpartidoxjugador_estado: 2 };
-        await genericController.updateOne(tablename, { id }, toUpdate, trx);
-      }
-    }
-  },
+  ctx.status = statusCreate;
+  ctx.body = { data: true };
 };
-exports.paxjuController = paxjuController;
+
+exports.deleteOne = async (ctx, next) => {
+  let { userInToken } = ctx.state;
+
+  const idjugador = userInToken.id;
+  const idpartido = ctx.params.id;
+
+  assertKOParams(ctx, idpartido, 'idpartido', enumType.number);
+  assertKOParams(ctx, idjugador, 'idjugador', enumType.number);
+
+  const partidoxjugadoABorrar = await busOwn.getOneByPartidoJugador(
+    idpartido,
+    idjugador,
+  );
+
+  await db.transaction(async function(trx) {
+    try {
+      // no tengo claro borrar estas tres tablas... lo hago para rehacer parejas...
+      await buspaxpixma.delByWhere({ idpartido }, trx);
+      await buspaxpi.delByWhere({ idpartido }, trx);
+      await buspaxpa.delByWhere({ idpartido }, trx);
+
+      await busOwn.delByWhere({ idjugador, idpartido }, trx);
+      await busPartido.IncrementOne(idpartido, -1, trx);
+
+      if (partidoxjugadoABorrar.idpartidoxjugador_estado === 1) {
+        // se ha borrado uno aceptado, hay que "subir" a un suplente
+
+        await busOwn.AsciendePrimerSuplente(idpartido);
+      }
+    } catch (err) {
+      await ctx.throw(401, err.message);
+    }
+  });
+
+  ctx.status = statusCreate;
+  ctx.body = { data: true };
+};

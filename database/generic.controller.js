@@ -15,35 +15,46 @@ exports.genericController = {
     return delRet;
   },
 
-  updateOne: async function(table, where, item, trx = null) {
-    if (trx) {
-      await trx(table)
-        .where(where)
-        .update(item);
-    } else {
-      await db(table)
-        .where(where)
-        .update(item);
-    }
+  updateOne: async function(table, where, update, trx = null) {
+    const acceso = trx || db;
+    await acceso(table)
+      .where(where)
+      .update(update);
   },
 
   createOne: async function(table, item, trx = null) {
+    const acceso = trx || db;
+    const getBD = await acceso(table)
+      .insert(item)
+      .returning('id');
+    item['id'] = getBD[0];
+    return item;
+  },
+
+  IncrementOne: async function(table, where, column, value, trx = null) {
     if (trx) {
-      const getBD = await trx(table)
-        .insert(item)
-        .returning('id');
-      item['id'] = getBD[0];
+      await trx(table)
+        .where(where)
+        .increment(column, value);
     } else {
-      const getBD = await db(table)
-        .insert(item)
-        .returning('id');
-      item['id'] = getBD[0];
+      await db(table)
+        .where(where)
+        .increment(column, value);
     }
   },
 
   delByWhere: async function(table, where, trx = null) {
     return this.deletegeneric(table, where, trx);
   },
+
+  GetCount: async function(table, colums, where) {
+    var items = await db
+      .count(colums)
+      .from(table)
+      .where(where);
+    return parseInt(items[0].count);
+  },
+
   getAll: async function(table, colums, where, orderBy = null) {
     var items = null;
     if (orderBy) {
@@ -74,6 +85,15 @@ exports.genericController = {
     return items;
   },
 
+  getFirstOne: async function(table, colums, where, orderBy, trx = null) {
+    const acceso = trx || db;
+    return acceso
+      .first(colums)
+      .from(table)
+      .where(where)
+      .orderBy(orderBy);
+  },
+
   getOnequery: async function(sql, parmans) {
     let data = null;
     if (parmans) {
@@ -97,5 +117,13 @@ exports.genericController = {
       data = await db.raw(sql);
     }
     return data.rows;
+  },
+  ExecuteQuery: async function(sql, parmans, trx = null) {
+    const acceso = trx || db;
+    if (parmans) {
+      await acceso.raw(sql, parmans);
+    } else {
+      await acceso.raw(sql);
+    }
   },
 };

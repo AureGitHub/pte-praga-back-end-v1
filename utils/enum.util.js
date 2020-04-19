@@ -24,3 +24,8 @@ exports.enumJugadorEstado = {
 exports.enumType = {
   number: 1,
 };
+
+exports.enumJugadorxpartidoEstado = {
+  Aceptado: 1,
+  Suplente: 2,
+};
