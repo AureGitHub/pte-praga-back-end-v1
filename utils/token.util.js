@@ -14,9 +14,12 @@ exports.generate = async (ctx, user) => {
   if (!ctx.body) {
     ctx.body = {};
   }
-  ctx.body[KeySecure] = { user, token, expire };
 
-  ctx.set(`${KeySecure}`, JSON.stringify({ user, token, expire }));
+  const timeout = SessionTime;
+
+  ctx.body[KeySecure] = { user, token, expire, timeout };
+
+  ctx.set(`${KeySecure}`, JSON.stringify({ user, token, expire, timeout }));
 
   // ctx.set(`${KeySecure}-user`, JSON.stringify(userWithoutidperfil));
   // ctx.set(`${KeySecure}-token`, `Bearer ${token}`);
