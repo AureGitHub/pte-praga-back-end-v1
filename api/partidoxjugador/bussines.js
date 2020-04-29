@@ -22,11 +22,12 @@ exports.SetEstado = function(jugadorestotal, jugadoresAceptados) {
 exports.getAllByIdpartido = async function(idpartido) {
   const sql = `select 
   j.id,
-  j.alias,
-  j.idposicion ,
+  j.alias nombre,  
+  pos.descripcion posicion,
   pj.idpartidoxjugador_estado
   from partidoxjugador pj
   inner join jugador j on pj.idjugador = j.id    
+  inner join  posicion pos on j.idposicion = pos.id
   where idpartido=?
   order by pj.created_at`;
   return genericController.getAllquery(sql, [idpartido]);

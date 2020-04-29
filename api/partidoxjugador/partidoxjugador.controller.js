@@ -4,6 +4,7 @@ const busPartido = require('../partido/bussines');
 const buspaxpixma = require('../partidoxpistaxmarcador/bussines');
 const buspaxpi = require('../partidoxpista/bussines');
 const buspaxpa = require('../partidoxpareja/bussines');
+const busju = require('../jugador/bussines');
 
 const { enumType } = require('../../utils/enum.util');
 
@@ -32,6 +33,20 @@ exports.getAllByIdpartido = async ctx => {
   const { idpartido } = ctx.params;
   assertKOParams(ctx, idpartido, 'idpartido');
   const data = await busOwn.getAllByIdpartido(idpartido);
+  ctx.status = statusOKSave;
+  ctx.body = { data };
+};
+
+exports.getAllToAddByIdpartido = async ctx => {
+  const { idpartido } = ctx.params;
+  assertKOParams(ctx, idpartido, 'idpartido');
+  const jugadoresApuntados = await busOwn.getAllByIdpartido(idpartido);
+  const jugadoresTodos = await busju.getAll();
+
+  const data = jugadoresTodos.filter(
+    a => !jugadoresApuntados.find(b => b.id === a.id),
+  );
+
   ctx.status = statusOKSave;
   ctx.body = { data };
 };
