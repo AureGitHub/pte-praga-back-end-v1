@@ -22,7 +22,8 @@ exports.SetEstado = function(jugadorestotal, jugadoresAceptados) {
 exports.getAllByIdpartido = async function(idpartido) {
   const sql = `select 
   j.id,
-  j.alias nombre,  
+  pj.id idpartidoxjugador,
+  j.alias,  
   pos.descripcion posicion,
   pj.idpartidoxjugador_estado
   from partidoxjugador pj

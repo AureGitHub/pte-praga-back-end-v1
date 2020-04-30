@@ -34,7 +34,10 @@ exports.getOne = async function(id) {
 };
 
 exports.getTotalJugadores = async function(id) {
-  return genericController.getOne(tablename, 'jugadorestotal', { id });
+  var data = await genericController.getOne(tablename, 'jugadorestotal', {
+    id,
+  });
+  return data.jugadorestotal;
 };
 
 exports.IncrementOne = async function(id, value, trx = null) {

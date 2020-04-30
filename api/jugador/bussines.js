@@ -4,7 +4,7 @@ const { genericController } = require('../../database/generic.controller');
 exports.getAll = async function() {
   const sql = `select 
     j.id,
-    j.alias nombre,  
+    j.alias,  
     pos.descripcion posicion  
   from jugador j
   inner join  posicion pos on j.idposicion = pos.id  

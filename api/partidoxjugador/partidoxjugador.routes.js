@@ -11,6 +11,7 @@ module.exports = Router => {
     .get('/:idpartido', controller.getAllByIdpartido)
     .get('/AddToPartido/:idpartido', controller.getAllToAddByIdpartido)
     .post('/', controller.createOne)
+    .post('/CreateAny', controller.CreateAny)
     .delete('/:id', controller.deleteOne);
   return router;
 };
