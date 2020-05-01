@@ -30,9 +30,13 @@ exports.refresh = async ctx => {
   try {
     var tokenInHeader = ctx.request.headers[KeySecure];
     if (tokenInHeader) {
-      tokenInHeader = tokenInHeader.replace('Bearer ', '');
-      var { data } = jsonwebtoken.verify(tokenInHeader, JWT_SECRET);
-      await this.generate(ctx, data);
+      if (ctx.state['jugadorUpdate']) {
+        await this.generate(ctx, ctx.state['jugadorUpdate']);
+      } else {
+        tokenInHeader = tokenInHeader.replace('Bearer ', '');
+        var { data } = jsonwebtoken.verify(tokenInHeader, JWT_SECRET);
+        await this.generate(ctx, data);
+      }
     }
   } catch (err) {
     // err NO hago nada... si ha llegado hasta aquí con un token erróneo, es porque está
