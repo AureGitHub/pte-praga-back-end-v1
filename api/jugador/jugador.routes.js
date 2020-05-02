@@ -10,6 +10,7 @@ module.exports = Router => {
     .get('/', controller.getAll)
     .get('/:id', controller.getOne)
     .post('/', controller.createOne)
+    .post('/public', controller.createOne)
     .put('/', controller.updateOne)
     .delete('/:id', controller.deleteOne);
   return router;

@@ -1,7 +1,11 @@
 'use strict';
 
 const busOwn = require('./bussines');
+const { enumJugadorEstado, enumPerfil } = require('../../utils/enum.util');
 const { enumType } = require('../../utils/enum.util');
+var { JugadorPasswordDefalult } = require('../../config');
+const bcrypt = require('../../utils/bcrypt.util');
+
 const {
   statusCreate,
   statusOKquery,
@@ -36,18 +40,42 @@ exports.getOne = async function getOne(ctx) {
 };
 
 exports.createOne = async function createOne(ctx) {
-  const jugador = ctx.request.body;
-  const { alias, nombre, idposicion, idperfil, idestado } = jugador;
+  const { alias, email, nombre, idposicion } = ctx.request.body;
   assertKOParams(ctx, alias, 'alias');
+  assertKOParams(ctx, email, 'alias');
   assertKOParams(ctx, nombre, 'nombre');
   assertKOParams(ctx, idposicion, 'idposicion', enumType.number);
-  assertKOParams(ctx, idperfil, 'idperfil', enumType.number);
-  assertKOParams(ctx, idestado, 'idestado', enumType.number);
 
-  if (jugador.hasOwnProperty('id')) {
-    delete jugador.id;
+  let idperfil = null;
+  let idestado = null;
+  let password = null;
+
+  if (ctx.request.body.hasOwnProperty('registrojugador')) {
+    // viene desde el registro
+    idperfil = enumPerfil.jugador;
+    idestado = enumJugadorEstado.debeConfEmail;
+    password = ctx.request.body['password'];
+    assertKOParams(ctx, password, 'password');
+  } else {
+    // viene desde el alta de la administación de jugadores
+    idperfil = ctx.request.body['idperfil'];
+    idestado = ctx.request.body['idestado'];
+    assertKOParams(ctx, idperfil, 'idperfil', enumType.number);
+    assertKOParams(ctx, idestado, 'idestado', enumType.number);
+    password = JugadorPasswordDefalult;
   }
 
+  const passwordhash = await bcrypt.hash(password);
+
+  const jugador = {
+    alias,
+    email,
+    nombre,
+    idposicion,
+    idperfil,
+    idestado,
+    passwordhash,
+  };
   const jugadorIserted = await busOwn.createOne(jugador);
 
   let data = await busOwn.getAll();

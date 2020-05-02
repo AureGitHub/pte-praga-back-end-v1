@@ -1,7 +1,5 @@
 const { genericController } = require('../../database/generic.controller');
-const { enumPerfil, enumJugadorEstado } = require('../../utils/enum.util');
-const bcrypt = require('../../utils/bcrypt.util');
-
+const { enumPerfil } = require('../../utils/enum.util');
 const tablename = 'jugador';
 
 exports.getAll = async function() {
@@ -31,8 +29,6 @@ exports.updateOne = async function(where, update, trx) {
 };
 
 exports.createOne = async function createOne(item, trx = null) {
-  item.passwordhash = await bcrypt.hash('123456');
-  item.idestado = enumJugadorEstado.debeCambiarPass;
   return genericController.createOne(tablename, item, trx);
 };
 

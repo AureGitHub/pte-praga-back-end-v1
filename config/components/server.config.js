@@ -35,6 +35,7 @@ const config = {
     port: envVars.PORT || 3000,
     apiVersion: envVars.API_VERSION || 'v1',
   },
+  JugadorPasswordDefalult: '123456',
 };
 
 module.exports = config;
