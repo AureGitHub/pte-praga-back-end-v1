@@ -29,3 +29,8 @@ exports.enumJugadorxpartidoEstado = {
   Aceptado: 1,
   Suplente: 2,
 };
+
+exports.enumTipoJugadorConfirmacion = {
+  Email: 1,
+  Password: 2,
+};

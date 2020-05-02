@@ -1,10 +1,15 @@
 'use strict';
 
+const db = require('../../database');
 const busOwn = require('./bussines');
+const busEmail = require('../email/bussiness');
+const busjuco = require('../jugador_confirmar/bussiness');
 const { enumJugadorEstado, enumPerfil } = require('../../utils/enum.util');
 const { enumType } = require('../../utils/enum.util');
 var { JugadorPasswordDefalult } = require('../../config');
 const bcrypt = require('../../utils/bcrypt.util');
+const { generate } = require('../../utils/token.util');
+let { compare } = require('../../utils/bcrypt.util');
 
 const {
   statusCreate,
@@ -50,7 +55,8 @@ exports.createOne = async function createOne(ctx) {
   let idestado = null;
   let password = null;
 
-  if (ctx.request.body.hasOwnProperty('registrojugador')) {
+  const makingRegistro = ctx.request.body.hasOwnProperty('registrojugador');
+  if (makingRegistro) {
     // viene desde el registro
     idperfil = enumPerfil.jugador;
     idestado = enumJugadorEstado.debeConfEmail;
@@ -78,14 +84,24 @@ exports.createOne = async function createOne(ctx) {
   };
   const jugadorIserted = await busOwn.createOne(jugador);
 
-  let data = await busOwn.getAll();
-  data = data.filter(a => a.id === jugadorIserted.id);
-  data = data[0];
+  let data = null;
+
+  if (makingRegistro) {
+    data = await busOwn.getOne(jugadorIserted.id); // datos para el token
+  } else {
+    // datos para añadir a la lista de jugadores
+    data = await busOwn.getAll();
+    data = data.filter(a => a.id === jugadorIserted.id);
+    data = data[0];
+  }
+
   ctx.status = statusCreate;
-
-  // devolverlo para insertarlo en la lista de usuario
-
   ctx.body = { data };
+  if (makingRegistro) {
+    await generate(ctx, data); // genero el token
+    await busEmail.enviarConfirmacionEmail(data.id, data.email);
+    // envío correo
+  }
 };
 
 exports.updateOne = async function updateOne(ctx) {
@@ -141,4 +157,54 @@ exports.deleteOne = async function deleteOne(ctx) {
   await busOwn.delByWhere({ id });
   ctx.status = statusOKSave;
   ctx.body = { data: parseInt(id) };
+};
+
+exports.CambiarPasswordOlvidada = async function CambiarPasswordOlvidada(ctx) {
+  const { uuid, password } = ctx.request.body;
+  assertKOParams(ctx, uuid, 'uuid');
+  assertKOParams(ctx, password, 'password');
+  let iduser = null;
+  await db.transaction(async function(trx) {
+    const confirmacion = await busjuco.verificarByuuid(uuid, trx);
+    assertKOParams(ctx, confirmacion, 'Código de confirmación incorrecto');
+    const passwordhash = await bcrypt.hash(password);
+    await busOwn.updateOne({ id: confirmacion.iduser }, { passwordhash }, trx);
+    iduser = confirmacion.iduser;
+  });
+
+  const data = await busOwn.getOne(iduser);
+  ctx.body = { data };
+  ctx.status = statusCreate;
+  await generate(ctx, data);
+};
+
+exports.CambiarPassword = async function CambiarPassword(ctx) {
+  const { oldpassword, password } = ctx.request.body;
+  assertKOParams(ctx, oldpassword, 'oldpassword');
+  assertKOParams(ctx, password, 'password');
+  const { userInToken } = ctx.state;
+  assertKOParams(
+    ctx,
+    userInToken,
+    'no se pueden obtener los datos del usuario',
+  );
+
+  const jugador = await busOwn.getOneWhere(['passwordhash', 'idestado'], {
+    id: userInToken.id,
+  });
+
+  if (await compare(oldpassword, jugador.passwordhash)) {
+    const passwordhash = await bcrypt.hash(password);
+    let update = { passwordhash };
+    if (jugador.idestado === enumJugadorEstado.debeCambiarPass) {
+      const idestado = enumJugadorEstado.activo;
+      update = { passwordhash, idestado };
+      ctx.state['idestadoNew'] = enumJugadorEstado.activo;
+    }
+    await busOwn.updateOne({ id: userInToken.id }, update);
+    ctx.status = 200;
+    ctx.body = { data: true };
+  } else {
+    assertKOParams(ctx, false, 'Contraseña antigua incorrecto');
+  }
 };

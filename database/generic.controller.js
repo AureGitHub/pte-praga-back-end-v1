@@ -31,6 +31,11 @@ exports.genericController = {
     return item;
   },
 
+  createOneSinRet: async function(table, item, trx = null) {
+    const acceso = trx || db;
+    await acceso(table).insert(item);
+  },
+
   IncrementOne: async function(table, where, column, value, trx = null) {
     if (trx) {
       await trx(table)

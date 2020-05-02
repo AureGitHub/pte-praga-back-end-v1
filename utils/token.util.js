@@ -30,13 +30,23 @@ exports.refresh = async ctx => {
   try {
     var tokenInHeader = ctx.request.headers[KeySecure];
     if (tokenInHeader) {
+      let userToToken = null;
       if (ctx.state['jugadorUpdate']) {
-        await this.generate(ctx, ctx.state['jugadorUpdate']);
+        // el jugador ha modificado sus datos
+        userToToken = ctx.state['jugadorUpdate'];
       } else {
+        // se obtiene el usuario desde el token
+        // habría que verificar que existe en BD
         tokenInHeader = tokenInHeader.replace('Bearer ', '');
-        var { data } = jsonwebtoken.verify(tokenInHeader, JWT_SECRET);
-        await this.generate(ctx, data);
+        userToToken = jsonwebtoken.verify(tokenInHeader, JWT_SECRET).data;
       }
+      if (ctx.state['idestadoNew']) {
+        // ha cambiado el estado del jugador
+        // cuando confirma su email
+        userToToken.idestado = ctx.state['idestadoNew'];
+      }
+
+      await this.generate(ctx, userToToken);
     }
   } catch (err) {
     // err NO hago nada... si ha llegado hasta aquí con un token erróneo, es porque está

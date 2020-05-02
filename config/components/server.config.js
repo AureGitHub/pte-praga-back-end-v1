@@ -31,6 +31,7 @@ const config = {
   KeySecure: 'authorization',
   JWT_SECRET: '30421687313841dzxcSSwWWXXa',
   SessionTime: 120,
+  SENDGRID_API_KEY: envVars.SENDGRID_API_KEY,
   server: {
     port: envVars.PORT || 3000,
     apiVersion: envVars.API_VERSION || 'v1',

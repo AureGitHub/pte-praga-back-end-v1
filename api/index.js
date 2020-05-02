@@ -18,7 +18,8 @@ function applyApiMiddleware(app) {
       file =>
         file.indexOf('.') !== 0 &&
         file !== baseName &&
-        file !== baseNameController,
+        file !== baseNameController &&
+        file !== 'email',
     )
     .forEach(file => {
       const api = require(path.join(__dirname, file))(Router);

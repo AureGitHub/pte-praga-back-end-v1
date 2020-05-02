@@ -11,6 +11,8 @@ module.exports = Router => {
     .get('/:id', controller.getOne)
     .post('/', controller.createOne)
     .post('/public', controller.createOne)
+    .post('/cambiarpassword', controller.CambiarPassword)
+    .post('/cambiarpasswordOlvidada/public', controller.CambiarPasswordOlvidada)
     .put('/', controller.updateOne)
     .delete('/:id', controller.deleteOne);
   return router;

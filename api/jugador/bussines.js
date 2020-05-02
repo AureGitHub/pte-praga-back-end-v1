@@ -24,6 +24,10 @@ exports.getOne = async function(id) {
   return userWithoutPass;
 };
 
+exports.getOneWhere = async function(columns, where) {
+  let dbUser = await genericController.getOne(tablename, columns, where);
+  return dbUser;
+};
 exports.updateOne = async function(where, update, trx) {
   return genericController.updateOne(tablename, where, update, trx);
 };
