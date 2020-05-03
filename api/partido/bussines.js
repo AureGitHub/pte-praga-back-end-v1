@@ -9,6 +9,7 @@ exports.getAll = async function(idjugador) {
   to_char("dia", 'DD/MM/YYYY HH24:MI') as dia,    
   p.duracion,
   p.pistas,
+  p.turnos,
   p.jugadorestotal,
   p.jugadoresapuntados,
   pj.id as idpartidoxjugador
@@ -26,6 +27,7 @@ exports.getOne = async function(id) {
   to_char("dia", 'DD/MM/YYYY HH24:MI') as dia,    
   p.duracion,
   p.pistas,
+  p.turnos,
   p.jugadorestotal,
   p.jugadoresapuntados   
   from partido p

@@ -36,12 +36,18 @@ exports.getOne = async function getOne(ctx) {
 
 exports.createOne = async function createOne(ctx) {
   const NewPartido = ctx.request.body;
-  const { idcreador, dia, duracion, pistas } = ctx.request.body;
+  const { idcreador, dia, duracion, pistas, turnos } = ctx.request.body;
   assertKOParams(ctx, idcreador, 'idcreador');
   assertKOParams(ctx, dia, 'dia');
   assertKOParams(ctx, duracion, 'duracion');
   assertKOParams(ctx, pistas, 'pistas');
-  const data = await busOwn.createOne(NewPartido);
+  assertKOParams(ctx, turnos, 'turnos');
+  let data = null;
+  await db.transaction(async function(trx) {
+    data = await busOwn.createOne(NewPartido, trx);
+    await buspaxpi.CreatePistas(data.id, pistas, turnos, trx);
+  });
+  
   ctx.status = statusCreate;
   ctx.body = { data };
 };
@@ -65,13 +71,14 @@ exports.updateOne = async function updateOne(ctx) {
   let { userInToken } = ctx.state;
 
   const partido = ctx.request.body;
-  const { id, idcreador, dia, duracion, pistas } = ctx.request.body;
+  const { id, idcreador, dia, duracion, pistas, turnos } = ctx.request.body;
 
   assertKOParams(ctx, id, 'id');
   assertKOParams(ctx, idcreador, 'idcreador');
   assertKOParams(ctx, dia, 'dia');
   assertKOParams(ctx, duracion, 'duracion');
   assertKOParams(ctx, pistas, 'pistas');
+  assertKOParams(ctx, turnos, 'turnos');
 
   // seguridad
   ctx.assert(
@@ -81,7 +88,7 @@ exports.updateOne = async function updateOne(ctx) {
   );
 
   const oldPartido = await db('partido')
-    .first('pistas')
+    .first(['pistas', 'turnos'])
     .where({ id });
 
   const message = `no se ecuentra el partido con id ${id}`;
@@ -94,6 +101,9 @@ exports.updateOne = async function updateOne(ctx) {
     await buspaxpa.delByWhere({ idpartido: id }, trx);
     await buspaxju.GestionSuplentes(oldPartido, partido, trx);
     await busOwn.updateOne({ id: partido.id }, partido);
+    if (oldPartido.pistas !== pistas || oldPartido.turnos !== turnos) {
+      await buspaxpi.CreatePistas(partido.id, pistas, turnos, trx);
+    }
   });
 
   ctx.status = statusOKSave;

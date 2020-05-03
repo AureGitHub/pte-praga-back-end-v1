@@ -1,9 +1,10 @@
 const { genericController } = require('../../database/generic.controller');
 const tablename = 'partidoxpista';
 
-exports.delByWhere = async function(where, trx) {
+var delByWhere = async function(where, trx) {
   return genericController.delByWhere(tablename, where, trx);
 };
+exports.delByWhere = delByWhere;
 
 exports.getAllByIdpartido = async idpartido => {
   const sql = `select 
@@ -25,4 +26,19 @@ exports.getAllByIdpartido = async idpartido => {
   where pxpi.idpartido=?
   order by idturno,idpista`;
   return genericController.getAllquery(sql, idpartido);
+};
+
+var createOne = async function(item, trx = null) {
+  var data = await genericController.createOne(tablename, item, trx);
+  return data;
+};
+
+exports.CreatePistas = async function(idpartido, pistas, turnos, trx) {
+  await delByWhere({ idpartido }, trx);
+  for (var idturno = 1; idturno <= turnos; idturno++) {
+    for (var idpista = 1; idpista <= pistas; idpista++) {
+      const nombre = `Partido_T${idturno}_P${idpista}`;
+      await createOne({ idpartido, idturno, idpista, nombre }, trx);
+    }
+  }
 };

@@ -49,6 +49,7 @@
     "koa-jwt": "^3.6.0",
     "koa-logger": "3.2.0",
     "koa-router": "7.4.0",
+    "koa-static": "^5.0.0",
     "pg": "^8.0.1",
     "sendgrid": "^5.2.3",
     "uuid": "^3.3.2"

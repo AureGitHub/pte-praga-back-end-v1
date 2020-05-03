@@ -5,7 +5,8 @@ const cors = require('@koa/cors');
 const helmet = require('koa-helmet')(/* Add your security option */);
 const logger = require('koa-logger')();
 var jwt = require('koa-jwt');
-
+var path = require('path');
+const serve = require('koa-static');
 const {
   errorHandler,
   secureHandler,
@@ -26,9 +27,11 @@ if (isDevelopment) {
 
 server.use(cors());
 
+server.use(serve(path.join(__dirname, '/dist')));
+
 server.use(errorjwtHandler);
 
-var unprotected = [/\/public/, /\/login/, /favicon.ico/];
+var unprotected = [/\/public/, /\/dist/, /\/login/, /favicon.ico/];
 server.use(jwt({ secret: JWT_SECRET }).unless({ path: unprotected }));
 /**
  * Add here only development middlewares
