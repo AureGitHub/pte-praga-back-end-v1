@@ -3,6 +3,9 @@
   "version": "1.0.1",
   "description": "Koa boilerplate template for create-koa-application.",
   "main": "index.js",
+  "engines": {
+    "node": "12.8.0"
+  },
   "scripts": {
     "check": "npm run format && npm run lint",
     "dev": "nodemon index.js",
