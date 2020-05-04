@@ -11,18 +11,16 @@ exports.getAllByIdpartido = async idpartido => {
   pxpi.id,
   pxpi.nombre,
   coalesce(jd1.alias,'jd1') jd1,
-  coalesce(jr1.alias,'jr1') jr1,
-  coalesce(jd2.alias,'jd2') jd2,
-  coalesce(jr2.alias,'jr2') jr2,
+  coalesce(jd2.alias,'jr1') jr1,
+  coalesce(jd3.alias,'jd2') jd2,
+  coalesce(jd4.alias,'jr2') jr2,
   pxpi.idpista,
   pxpi.idturno
-  from partidoxpista pxpi
-  left join  partidoxpareja pxpa1 on pxpi.idpartidoxpareja1 = pxpa1.id
-  left join  partidoxpareja pxpa2 on pxpi.idpartidoxpareja2 = pxpa2.id
-  left join jugador jd1 on pxpa1.iddrive= jd1.id
-  left join jugador jr1 on pxpa1.idreves= jr1.id
-  left join jugador jd2 on pxpa2.iddrive= jd2.id
-  left join jugador jr2 on pxpa2.idreves= jr2.id  
+  from partidoxpista pxpi  
+  left join jugador jd1 on pxpi.idjugadordrive1 = jd1.id
+  left join jugador jd2 on pxpi.idjugadorreves1 = jd2.id
+  left join jugador jd3 on pxpi.idjugadordrive2 = jd3.id
+  left join jugador jd4 on pxpi.idjugadorreves2 = jd4.id  
   where pxpi.idpartido=?
   order by idturno,idpista`;
   return genericController.getAllquery(sql, idpartido);
