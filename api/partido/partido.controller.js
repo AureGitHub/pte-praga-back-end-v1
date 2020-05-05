@@ -3,7 +3,7 @@
 const db = require('../../database');
 const busOwn = require('./bussines');
 const buspaxpixma = require('../partidoxpistaxmarcador/bussines');
-const buspaxpi = require('../partidoxpista/bussines');
+const buspaxpi = require('../partidoxpistaxjugador/bussines');
 const buspaxpa = require('../partidoxpareja/bussines');
 const buspaxju = require('../partidoxjugador/bussines');
 const buspaxpixra = require('../partidoxpistaxranking/bussines');
@@ -47,7 +47,7 @@ exports.createOne = async function createOne(ctx) {
     data = await busOwn.createOne(NewPartido, trx);
     await buspaxpi.CreatePistas(data.id, pistas, turnos, trx);
   });
-  
+
   ctx.status = statusCreate;
   ctx.body = { data };
 };
@@ -106,8 +106,10 @@ exports.updateOne = async function updateOne(ctx) {
     }
   });
 
+  let data = await await busOwn.getOne(id);
+
   ctx.status = statusOKSave;
-  ctx.body = { data: partido };
+  ctx.body = { data };
 };
 
 exports.finalizaOne = async ctx => {

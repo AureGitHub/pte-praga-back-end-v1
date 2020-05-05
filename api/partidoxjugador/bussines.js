@@ -24,6 +24,7 @@ exports.getAllByIdpartido = async function(idpartido) {
   j.id,
   pj.id idpartidoxjugador,
   j.alias,  
+  j.idposicion,
   pos.descripcion posicion,
   pj.idpartidoxjugador_estado
   from partidoxjugador pj
@@ -79,14 +80,16 @@ exports.delByIdpartido = async function(idpartido, trx) {
 var getAceptados = async function(idpartido) {
   return genericController.getAll(tablename, 'id', {
     idpartido,
-    idpartidoxjugador_estado: 1,
+    idpartidoxjugador_estado: enumJugadorxpartidoEstado.Aceptado,
   });
 };
+
+exports.getAceptados = getAceptados;
 
 var getSupentes = async function(idpartido) {
   return genericController.getAll(tablename, 'id', {
     idpartido,
-    idpartidoxjugador_estado: 1,
+    idpartidoxjugador_estado: enumJugadorxpartidoEstado.Suplente,
   });
 };
 

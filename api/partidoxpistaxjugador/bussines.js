@@ -1,5 +1,9 @@
 const { genericController } = require('../../database/generic.controller');
-const tablename = 'partidoxpista';
+const tablename = 'partidoxpistaxjugador';
+
+exports.updateOne = async function(where, update, trx) {
+  return genericController.updateOne(tablename, where, update, trx);
+};
 
 var delByWhere = async function(where, trx) {
   return genericController.delByWhere(tablename, where, trx);
@@ -10,13 +14,13 @@ exports.getAllByIdpartido = async idpartido => {
   const sql = `select 
   pxpi.id,
   pxpi.nombre,
-  coalesce(jd1.alias,'jd1') jd1,
-  coalesce(jd2.alias,'jr1') jr1,
-  coalesce(jd3.alias,'jd2') jd2,
-  coalesce(jd4.alias,'jr2') jr2, 
+  coalesce(jd1.alias,'-') jd1,
+  coalesce(jd2.alias,'-') jr1,
+  coalesce(jd3.alias,'-') jd2,
+  coalesce(jd4.alias,'-') jr2, 
   pxpi.idpista,
   pxpi.idturno
-  from partidoxpista pxpi  
+  from partidoxpistaxjugador pxpi  
   left join jugador jd1 on pxpi.idjugadordrive1 = jd1.id
   left join jugador jd2 on pxpi.idjugadorreves1 = jd2.id
   left join jugador jd3 on pxpi.idjugadordrive2 = jd3.id
