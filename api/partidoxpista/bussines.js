@@ -5,7 +5,7 @@ var delByWhere = async function(where, trx) {
   return genericController.delByWhere(tablename, where, trx);
 };
 exports.delByWhere = delByWhere;
-
+// para pubicar
 exports.getAllByIdpartido = async idpartido => {
   const sql = `select 
   pxpi.id,
@@ -13,7 +13,7 @@ exports.getAllByIdpartido = async idpartido => {
   coalesce(jd1.alias,'jd1') jd1,
   coalesce(jd2.alias,'jr1') jr1,
   coalesce(jd3.alias,'jd2') jd2,
-  coalesce(jd4.alias,'jr2') jr2,
+  coalesce(jd4.alias,'jr2') jr2, 
   pxpi.idpista,
   pxpi.idturno
   from partidoxpista pxpi  
