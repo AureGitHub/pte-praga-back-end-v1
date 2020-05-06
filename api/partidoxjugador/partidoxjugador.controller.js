@@ -1,9 +1,6 @@
 const db = require('../../database');
 const busOwn = require('./bussines');
 const busPartido = require('../partido/bussines');
-const buspaxpixma = require('../partidoxpistaxmarcador/bussines');
-const buspaxpi = require('../partidoxpistaxjugador/bussines');
-const buspaxpa = require('../partidoxpareja/bussines');
 const busju = require('../jugador/bussines');
 
 const { enumType } = require('../../utils/enum.util');
