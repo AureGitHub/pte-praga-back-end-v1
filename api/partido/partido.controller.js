@@ -42,6 +42,15 @@ exports.createOne = async function createOne(ctx) {
   assertKOParams(ctx, duracion, 'duracion');
   assertKOParams(ctx, pistas, 'pistas');
   assertKOParams(ctx, turnos, 'turnos');
+
+  if (pistas === 1 && turnos !== 1) {
+    assertKOParams(
+      ctx,
+      false,
+      'Si solo hay una pista, solo puede haber 1 turno',
+    );
+  }
+
   let data = null;
   await db.transaction(async function(trx) {
     data = await busOwn.createOne(NewPartido, trx);
@@ -79,6 +88,14 @@ exports.updateOne = async function updateOne(ctx) {
   assertKOParams(ctx, duracion, 'duracion');
   assertKOParams(ctx, pistas, 'pistas');
   assertKOParams(ctx, turnos, 'turnos');
+
+  if (pistas === 1 && turnos !== 1) {
+    assertKOParams(
+      ctx,
+      false,
+      'Si solo hay una pista, solo puede haber 1 turno',
+    );
+  }
 
   // seguridad
   ctx.assert(

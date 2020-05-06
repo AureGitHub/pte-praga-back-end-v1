@@ -4,6 +4,7 @@ const http = require('http');
 const server = require('./server');
 
 const { port } = require('./config').server;
+const { isDevelopment } = require('./config');
 
 async function bootstrap() {
   /**
@@ -11,7 +12,9 @@ async function bootstrap() {
    * e.g.
    * await sequelize.authenticate()
    */
-  return http.createServer(server.callback()).listen(port);
+
+  const IpLocal = isDevelopment ? '192.168.1.133' : '';
+  return http.createServer(server.callback()).listen(port, IpLocal);
 }
 
 bootstrap()

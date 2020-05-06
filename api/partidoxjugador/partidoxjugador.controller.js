@@ -104,11 +104,6 @@ exports.deleteOne = async (ctx, next) => {
   const { idpartido, idjugador } = partidoxjugadoABorrar;
 
   await db.transaction(async function(trx) {
-    // no tengo claro borrar estas tres tablas... lo hago para rehacer parejas...
-    await buspaxpixma.delByWhere({ idpartido }, trx);
-    await buspaxpi.delByWhere({ idpartido }, trx);
-    await buspaxpa.delByWhere({ idpartido }, trx);
-
     await busOwn.delByWhere({ idjugador, idpartido }, trx);
     await busPartido.IncrementOne(idpartido, -1, trx);
 
