@@ -37,30 +37,9 @@ function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-exports.CreateParejasAleatorio = async ctx => {
-  const { idpartido } = ctx.params;
-  assertKOParams(ctx, idpartido, 'idpartido');
-
-  let jugadores = await buspaxju.getAllByIdpartido(idpartido);
-  const partido = await buspar.getOne(idpartido);
-  const { pistas, turnos } = partido;
-
-  let lstdrivers = jugadores.filter(
-    a =>
-      a.idpartidoxjugador_estado === enumJugadorxpartidoEstado.Aceptado &&
-      a.idposicion === enumPosicion.drive,
-  );
-
-  let lstreves = jugadores.filter(
-    a =>
-      a.idpartidoxjugador_estado === enumJugadorxpartidoEstado.Aceptado &&
-      a.idposicion === enumPosicion.reves,
-  );
-
-  let parejas = [];
-
+function HacerParejas(lstdrivers, lstreves, pistas) {
   let numPar = 0;
-
+  let parejas = [];
   while (lstdrivers.length > 0 || lstreves.length > 0) {
     let drive = null;
     let reves = null;
@@ -105,6 +84,10 @@ exports.CreateParejasAleatorio = async ctx => {
     });
   }
 
+  return parejas;
+}
+
+function HacerDistribucion(turnos, pistas, parejas) {
   let hanJugado = [];
 
   let distribucionTurnoPista = [];
@@ -136,6 +119,31 @@ exports.CreateParejasAleatorio = async ctx => {
       distribucionTurnoPista.push({ idturno, idpista, p1, p2 });
     }
   }
+  return distribucionTurnoPista;
+}
+
+exports.CreateParejasAleatorio = async ctx => {
+  const { idpartido } = ctx.params;
+  assertKOParams(ctx, idpartido, 'idpartido');
+
+  let jugadores = await buspaxju.getAllByIdpartido(idpartido);
+  const partido = await buspar.getOne(idpartido);
+  const { pistas, turnos } = partido;
+
+  let lstdrivers = jugadores.filter(
+    a =>
+      a.idpartidoxjugador_estado === enumJugadorxpartidoEstado.Aceptado &&
+      a.idposicion === enumPosicion.drive,
+  );
+
+  let lstreves = jugadores.filter(
+    a =>
+      a.idpartidoxjugador_estado === enumJugadorxpartidoEstado.Aceptado &&
+      a.idposicion === enumPosicion.reves,
+  );
+
+  const parejas = HacerParejas(lstdrivers, lstreves, pistas);
+  const distribucionTurnoPista = HacerDistribucion(turnos, pistas, parejas);
 
   // modifico las pistas con las parejas
   await db.transaction(async function(trx) {
