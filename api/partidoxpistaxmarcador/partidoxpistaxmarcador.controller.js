@@ -24,8 +24,8 @@ exports.createOne = async ctx => {
   assertKOParams(ctx, idpartido, 'idpartido');
   assertKOParams(ctx, idpartidoxpista, 'idpartidoxpista');
   assertKOParams(ctx, idset, 'idset');
-  assertKOParams(ctx, juegospareja1, 'juegospareja1');
-  assertKOParams(ctx, juegospareja2, 'juegospareja2');
+  assertKOParams(ctx, juegospareja1 >= 0, 'juegospareja1');
+  assertKOParams(ctx, juegospareja2 >= 0, 'juegospareja2');
 
   item = await busOwen.createOne(item);
   ctx.status = statusOKSave;
@@ -46,10 +46,18 @@ exports.updateOne = async ctx => {
   assertKOParams(ctx, idpartido, 'idpartido');
   assertKOParams(ctx, idpartidoxpista, 'idpartidoxpista');
   assertKOParams(ctx, idset, 'idset');
-  assertKOParams(ctx, juegospareja1, 'juegospareja1');
-  assertKOParams(ctx, juegospareja2, 'juegospareja2');
+  assertKOParams(ctx, juegospareja1 >= 0, 'juegospareja1');
+  assertKOParams(ctx, juegospareja2 >= 0, 'juegospareja2');
 
   await busOwen.updateOne({ id }, item);
   ctx.status = statusOKSave;
   ctx.body = { data: item };
+};
+
+exports.deleteOne = async function deleteOne(ctx) {
+  const { id } = ctx.params;
+  assertKOParams(ctx, id, 'id');
+  let nDel = await busOwen.delByWhere({ id });
+  ctx.status = statusOKSave;
+  ctx.body = { data: nDel === 1 };
 };

@@ -29,9 +29,14 @@ exports.getOne = async function(id) {
   p.pistas,
   p.turnos,
   p.jugadorestotal,
-  p.jugadoresapuntados   
+  p.jugadoresapuntados,
+  p.idpartido_estado = 1 abierto,
+  p.idpartido_estado = 2 cerrado,
+  p.idpartido_estado = 3 finalizado,
+  pe.descripcion  estado_des
   from partido p
-  where id=?`;
+  inner join partido_estado pe on p.idpartido_estado = pe.id
+  where p.id=?`;
   return genericController.getOnequery(sql, id);
 };
 

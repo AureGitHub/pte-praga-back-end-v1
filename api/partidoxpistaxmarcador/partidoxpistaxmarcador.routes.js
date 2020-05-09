@@ -7,6 +7,7 @@ module.exports = Router => {
   router
     .post('/', controller.createOne)
     .get('/:idpartido', controller.getAllByIdpartido)
+    .delete('/:id', controller.deleteOne)
     .put('/', controller.updateOne);
 
   return router;
