@@ -12,9 +12,14 @@ exports.getAll = async function(idjugador) {
   p.turnos,
   p.jugadorestotal,
   p.jugadoresapuntados,
-  pj.id as idpartidoxjugador
+  pj.id as idpartidoxjugador,
+  p.idpartido_estado = 1 abierto,
+  p.idpartido_estado = 2 cerrado,
+  p.idpartido_estado = 3 finalizado,
+  pe.descripcion  estado_des
   from partido p
   left join partidoxjugador pj on p.id = pj.idpartido and pj.idjugador = ?
+  inner join partido_estado pe on p.idpartido_estado = pe.id
   order by p.dia desc`;
   return genericController.getAllquery(sql, idjugador);
 };

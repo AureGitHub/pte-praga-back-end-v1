@@ -1,5 +1,5 @@
 const { genericController } = require('../../database/generic.controller');
-// const tablename = 'partidoxpistaxranking';
+const tablename = 'jugadorxranking';
 
 exports.updateFinalizaOne = async (id, trx) => {
   const sql = `
@@ -59,4 +59,13 @@ exports.getAllByIdpartido = async idpartido => {
   group by drive, reves
   order by ganados desc, juegos desc`;
   return genericController.getAllquery(sql, [idpartido]);
+};
+
+exports.createOne = async function createOne(item, trx = null) {
+  item = await genericController.createOne(tablename, item, trx);
+  return item;
+};
+
+exports.delByWhere = async function(where, trx) {
+  return genericController.delByWhere(tablename, where, trx);
 };

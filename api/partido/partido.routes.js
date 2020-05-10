@@ -12,7 +12,10 @@ module.exports = Router => {
     .post('/', controller.createOne)
     .delete('/:id', controller.deleteOne)
     .put('/', controller.updateOne)
-    .put('/finaliza', controller.finalizaOne);
+    .put('/cerrar', controller.cerrarOne)
+    .put('/abrir', controller.abrirOne)
+    .put('/finalizar', controller.finalizaOne)
+    .put('/desfinalizar', controller.desfinalizaOne);
   return router;
 };
 

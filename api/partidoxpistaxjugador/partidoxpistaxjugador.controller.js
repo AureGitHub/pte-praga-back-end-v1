@@ -146,63 +146,7 @@ function HacerDistribucion(ctx, turnos, pistas, parejas) {
       });
     }
   }
-
   return distribucionTurnoPista;
-  // let hanJugado = [];
-
-  // let distribucionTurnoPista = [];
-
-  // if (pistas === 1) {
-  //   const idturno = 1;
-  //   const idpista = 1;
-  //   const p1 = parejas[0];
-  //   const p2 = parejas[1];
-  //   distribucionTurnoPista.push({ idturno, idpista, p1, p2 });
-  //   return distribucionTurnoPista;
-  // }
-
-  // for (var idturno = 1; idturno <= turnos; idturno++) {
-  //   let copiaParejas = [...parejas];
-  //   for (var idpista = 1; idpista <= pistas; idpista++) {
-  //     const indexCopia = getRndInteger(0, copiaParejas.length - 1);
-  //     const p1 = copiaParejas[indexCopia];
-  //     copiaParejas.splice(indexCopia, 1);
-  //     let p2 = null;
-  //     let Encontrado = false;
-  //     let ControlBucleInfinito = 3000;
-  //     while (
-  //       ControlBucleInfinito > 0 &&
-  //       !Encontrado &&
-  //       copiaParejas.length > 0
-  //     ) {
-  //       ControlBucleInfinito--;
-  //       const indexCopia2 = getRndInteger(0, copiaParejas.length - 1);
-  //       p2 = copiaParejas[indexCopia2];
-
-  //       if (
-  //         !hanJugado.some(
-  //           a =>
-  //             (a.numPar1 === p1.numPar && a.numPar2 === p2.numPar) ||
-  //             (a.numPar2 === p1.numPar && a.numPar1 === p2.numPar),
-  //         )
-  //       ) {
-  //         Encontrado = true;
-  //         copiaParejas.splice(indexCopia2, 1);
-  //         hanJugado.push({ numPar1: p1.numPar, numPar2: p2.numPar });
-  //       }
-  //     }
-  //     if (ControlBucleInfinito === 0) {
-  //       assertKOParams(
-  //         ctx,
-  //         ControlBucleInfinito > 0,
-  //         'No se han podido realizar los calculos.. fallo de algoritmo',
-  //       );
-  //     }
-
-  //     distribucionTurnoPista.push({ idturno, idpista, p1, p2 });
-  //   }
-  // }
-  // return distribucionTurnoPista;
 }
 
 exports.CreateParejasAleatorio = async ctx => {

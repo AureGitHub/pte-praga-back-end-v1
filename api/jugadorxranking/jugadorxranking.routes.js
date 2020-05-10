@@ -1,5 +1,5 @@
 'use strict';
-const controller = require('./partidoxpistaxranking.controller');
+const controller = require('./jugadorxranking.controller');
 
 const prefix = `/partidoxpistaxranking`;
 module.exports = Router => {

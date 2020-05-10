@@ -13,7 +13,7 @@ async function bootstrap() {
    * await sequelize.authenticate()
    */
 
-  const IpLocal = isDevelopment ? '192.168.1.133' : '';
+  const IpLocal = isDevelopment ? '192.168.1.130' : '';
   return http.createServer(server.callback()).listen(port, IpLocal);
 }
 

@@ -78,41 +78,53 @@ exports.delByIdpartido = async function(idpartido, trx) {
 };
 
 var getAceptados = async function(idpartido) {
-  return genericController.getAll(tablename, 'id', {
-    idpartido,
-    idpartidoxjugador_estado: enumJugadorxpartidoEstado.Aceptado,
-  });
+  return genericController.getAll(
+    tablename,
+    'id',
+    {
+      idpartido,
+      idpartidoxjugador_estado: enumJugadorxpartidoEstado.Aceptado,
+    },
+    'created_at',
+  );
 };
 
-exports.getAceptados = getAceptados;
-
 var getSupentes = async function(idpartido) {
-  return genericController.getAll(tablename, 'id', {
-    idpartido,
-    idpartidoxjugador_estado: enumJugadorxpartidoEstado.Suplente,
-  });
+  return genericController.getAll(
+    tablename,
+    'id',
+    {
+      idpartido,
+      idpartidoxjugador_estado: enumJugadorxpartidoEstado.Suplente,
+    },
+    'created_at',
+  );
 };
 
 var SuplentesAceptados = async function(idpartido, cuantos, trx) {
-  const suplentes = await getSupentes(idpartido);
-  // como mucho, todos los suplentes que hay
+  let suplentes = await getSupentes(idpartido);
   const LosQuePasan = cuantos > suplentes.length ? suplentes.length : cuantos;
   for (let index = 0; index < LosQuePasan; index++) {
     if (suplentes[index]) {
       const { id } = suplentes[index];
-      const toUpdate = { idpartidoxjugador_estado: 1 };
+      const toUpdate = {
+        idpartidoxjugador_estado: enumJugadorxpartidoEstado.Aceptado,
+      };
       await updateOne({ id }, toUpdate, trx);
     }
   }
 };
 
 var AceptadosSuplentes = async function(idpartido, TotalPuedenJugar, trx) {
-  const aceptados = await getAceptados(idpartido);
+  let aceptados = await getAceptados(idpartido);
+  aceptados = aceptados.reverse(); // ultimos en ser aceptados, primeros en pasar a suplente
   const cuantosAceptadosDescienden = aceptados.length - TotalPuedenJugar;
   for (let index = 0; index < cuantosAceptadosDescienden; index++) {
     if (aceptados[index]) {
       const { id } = aceptados[index];
-      const toUpdate = { idpartidoxjugador_estado: 2 };
+      const toUpdate = {
+        idpartidoxjugador_estado: enumJugadorxpartidoEstado.Suplente,
+      };
       await updateOne({ id }, toUpdate, trx);
     }
   }
