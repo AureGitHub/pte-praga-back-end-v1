@@ -51,13 +51,16 @@ exports.updateFinalizaOne = async (id, trx) => {
 
 exports.getAllByIdpartido = async idpartido => {
   const sql = `
-  select drive.alias drive, reves.alias reves, sum(gana) ganados, sum(juegos) juegos
-  from partidoxpistaxranking ppr
-  inner join jugador drive on ppr.iddrive = drive.id
-  inner join jugador reves on ppr.idreves = reves.id
-  where ppr.idpartido = ?
-  group by drive, reves
-  order by ganados desc, juegos desc`;
+  select 
+ju.alias,
+partidog pg,
+partidop pp,
+juegosg jg,
+juegosp  jp
+from jugadorxranking jr 
+inner join jugador ju on jr.idjugador = ju.id  
+where jr.idpartido  = ?
+order by partidog desc, partidop asc, juegosg-juegosp desc, juegosg desc, juegosp desc, alias  asc`;
   return genericController.getAllquery(sql, [idpartido]);
 };
 

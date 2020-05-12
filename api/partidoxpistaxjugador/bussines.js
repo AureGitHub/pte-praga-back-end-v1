@@ -64,30 +64,10 @@ function VecesjugoComo(lstparxmar, pos, idjugador) {
   return lista.length;
 }
 function ResultadosByJugador(lstparxmar, idjugador) {
-  const listaComoP1 = lstparxmar.filter(
-    a => a.idjugadordrive1 === idjugador || a.idjugadorreves1 === idjugador,
-  );
   let juegosg = 0;
   let juegosp = 0;
   let partidog = 0;
   let partidop = 0;
-  // listaComoP1.forEach(item => {
-  //   juegosg += item.juegospareja1;
-  //   juegosp += item.juegospareja2;
-  //   partidog += item.gana1;
-  //   partidop += item.gana2;
-  // });
-
-  // const listaComoP2 = lstparxmar.filter(
-  //   a => a.idjugadordrive2 === idjugador || a.idjugadorreves2 === idjugador,
-  // );
-  // listaComoP2.forEach(item => {
-  //   juegosg += item.juegospareja2;
-  //   juegosp += item.juegospareja1;
-  //   partidog += item.gana2;
-  //   partidop += item.gana1;
-  // });
-
   let juegosgd = 0;
   let juegosgr = 0;
   let juegospd = 0;

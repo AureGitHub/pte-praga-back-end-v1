@@ -10,10 +10,10 @@ var secureEntrada = async (ctx, next) => {
     ctx.state['userInToken'] = userInToken;
   }
 
-  console.log('entra');
+  // console.log('entra');
 };
 var secureSalida = async (ctx, next) => {
-  console.log('sale');
+  // console.log('sale');
   await refresh(ctx);
 };
 module.exports = async (ctx, next) => {
