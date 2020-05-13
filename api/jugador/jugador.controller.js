@@ -163,16 +163,20 @@ exports.CambiarPasswordOlvidada = async function CambiarPasswordOlvidada(ctx) {
   const { uuid, password } = ctx.request.body;
   assertKOParams(ctx, uuid, 'uuid');
   assertKOParams(ctx, password, 'password');
-  let iduser = null;
+  let idjugador = null;
   await db.transaction(async function(trx) {
     const confirmacion = await busjuco.verificarByuuid(uuid, trx);
     assertKOParams(ctx, confirmacion, 'Código de confirmación incorrecto');
     const passwordhash = await bcrypt.hash(password);
-    await busOwn.updateOne({ id: confirmacion.iduser }, { passwordhash }, trx);
-    iduser = confirmacion.iduser;
+    await busOwn.updateOne(
+      { id: confirmacion.idjugador },
+      { passwordhash },
+      trx,
+    );
+    idjugador = confirmacion.idjugador;
   });
 
-  const data = await busOwn.getOne(iduser);
+  const data = await busOwn.getOne(idjugador);
   ctx.body = { data };
   ctx.status = statusCreate;
   await generate(ctx, data);

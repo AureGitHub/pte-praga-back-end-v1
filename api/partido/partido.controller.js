@@ -4,8 +4,8 @@ const db = require('../../database');
 const busOwn = require('./bussines');
 const buspaxpixma = require('../partidoxpistaxmarcador/bussines');
 const buspaxpi = require('../partidoxpistaxjugador/bussines');
-const buspaxpa = require('../partidoxpareja/bussines');
 const buspaxju = require('../partidoxjugador/bussines');
+const juxre = require('../jugadorxresultado/bussines');
 const juxra = require('../jugadorxranking/bussines');
 
 const {
@@ -68,7 +68,6 @@ exports.deleteOne = async function deleteOne(ctx) {
   await db.transaction(async function(trx) {
     await buspaxpixma.delByWhere({ idpartido: id }, trx);
     await buspaxpi.delByWhere({ idpartido: id }, trx);
-    await buspaxpa.delByWhere({ idpartido: id }, trx);
     await buspaxju.delByWhere({ idpartido: id }, trx);
     nDel = await busOwn.delByWhere({ id }, trx);
   });
@@ -112,7 +111,6 @@ exports.updateOne = async function updateOne(ctx) {
   await db.transaction(async function(trx) {
     await buspaxpixma.delByWhere({ idpartido: id }, trx);
     await buspaxpi.delByWhere({ idpartido: id }, trx);
-    await buspaxpa.delByWhere({ idpartido: id }, trx);
     await buspaxju.GestionSuplentes(oldPartido, partido, trx);
     await busOwn.updateOne({ id: partido.id }, partido);
     if (oldPartido.pistas !== pistas || oldPartido.turnos !== turnos) {
@@ -153,6 +151,21 @@ exports.abrirOne = async ctx => {
   ctx.body = { data };
 };
 
+const RecalcularCoeficiente = async function(trx) {
+  // me tengo que currar la query para que me lo de agrupado por jugador
+  const lstResultados = await juxre.getAll();
+
+  // para cada jugador, calcular su ranking
+  // (pg / pj ) * 10  +  0,1 * (jg - gp)
+
+  lstResultados.forEach(item => {});
+
+  // borrar le ranking
+  juxra.deleteAll(trx);
+  // ordenar la lista desc según coeficiente
+  // insertar en ese orden incrementando la posicion (empezando en 1)
+};
+
 exports.finalizaOne = async ctx => {
   const { id } = ctx.request.body;
   assertKOParams(ctx, id, 'id', enumType.number);
@@ -168,8 +181,9 @@ exports.finalizaOne = async ctx => {
     const toUpdate = { idpartido_estado: enumPartidoEstado.finalizado };
     await busOwn.updateOne({ id }, toUpdate);
     for (var index = 0; index < jugadorxmarcador.length; index++) {
-      await juxra.createOne(jugadorxmarcador[index], trx);
+      await juxre.createOne(jugadorxmarcador[index], trx);
     }
+    RecalcularCoeficiente(trx);
   });
   partido = await busOwn.getOne(id);
   ctx.status = statusOKSave;
@@ -183,7 +197,7 @@ exports.desfinalizaOne = async ctx => {
   await db.transaction(async function(trx) {
     const toUpdate = { idpartido_estado: enumPartidoEstado.cerrado };
     await busOwn.updateOne({ id }, toUpdate);
-    await juxra.delByWhere({ idpartido: id }, trx);
+    await juxre.delByWhere({ idpartido: id }, trx);
   });
 
   const partido = await busOwn.getOne(id);

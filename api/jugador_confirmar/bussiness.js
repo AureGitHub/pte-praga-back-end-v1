@@ -1,5 +1,5 @@
 const { genericController } = require('../../database/generic.controller');
-const uuidv4 = require('uuid/v4');
+// const uuidv4 = require('uuid/v4');
 const db = require('../../database');
 const tablename = 'jugador_confirmar';
 
@@ -9,15 +9,16 @@ const delByWhere = async function(where, trx) {
 
 exports.delByWhere = delByWhere;
 
-exports.createOne = async function createOne(iduser, idtipoconfirmacion) {
-  const uuid = uuidv4();
+exports.createOne = async function createOne(idjugador, idtipoconfirmacion) {
+  // const uuid = uuidv4();
+  const uuid = Math.floor(1000 + Math.random() * 9000);
 
   await db.transaction(async function(trx) {
-    await delByWhere({ iduser, idtipoconfirmacion }, trx);
+    await delByWhere({ idjugador, idtipoconfirmacion }, trx);
     await genericController.createOneSinRet(
       tablename,
       {
-        iduser,
+        idjugador,
         idtipoconfirmacion,
         uuid,
       },
@@ -28,19 +29,19 @@ exports.createOne = async function createOne(iduser, idtipoconfirmacion) {
 };
 
 exports.verificarEmail = async function verificarEmail(
-  iduser,
+  idjugador,
   idtipoconfirmacion,
   uuid,
   trx,
 ) {
   const data = await genericController.getOne(tablename, '*', {
-    iduser,
+    idjugador,
     idtipoconfirmacion,
   });
   const confirmacion = data && data.uuid === uuid;
 
   if (confirmacion) {
-    await delByWhere({ iduser, idtipoconfirmacion }, trx);
+    await delByWhere({ idjugador, idtipoconfirmacion }, trx);
   }
 
   return confirmacion;

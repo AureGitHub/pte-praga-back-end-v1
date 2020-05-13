@@ -1,11 +1,11 @@
 'use strict';
 const controller = require('./jugadorxranking.controller');
 
-const prefix = `/partidoxpistaxranking`;
+const prefix = `/jugadorxranking`;
 module.exports = Router => {
   const router = new Router({ prefix });
 
-  router.get('/:idpartido', controller.getAllByIdpartido);
+  router.get('/:idpartido', controller.getAll);
 
   return router;
 };

@@ -15,6 +15,11 @@ exports.genericController = {
     return delRet;
   },
 
+  deleteAll: async function(table, trx = null) {
+    const acceso = trx || db;
+    await acceso(table).del();
+  },
+
   updateOne: async function(table, where, update, trx = null) {
     const acceso = trx || db;
     await acceso(table)
