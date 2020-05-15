@@ -68,59 +68,68 @@ function ResultadosByJugador(lstparxmar, idjugador) {
   let juegosp = 0;
   let partidog = 0;
   let partidop = 0;
+  let partidoe = 0;
   let juegosgd = 0;
   let juegosgr = 0;
   let juegospd = 0;
   let juegospr = 0;
   let partidogd = 0;
   let partidogr = 0;
+  let partidoed = 0;
   let partidopd = 0;
   let partidopr = 0;
+  let partidoer = 0;
 
   lstparxmar.forEach(item => {
     if (item.idjugadordrive1 === idjugador) {
+      partidog += item.gana1;
+      partidop += item.gana2;
+      partidoe += item.gana1 === item.gana2 ? 1 : 0;
+      juegosg += item.juegospareja1;
+      juegosp += item.juegospareja2;
+
       juegosgd += item.juegospareja1;
       juegospd += item.juegospareja2;
       partidogd += item.gana1;
       partidopd += item.gana2;
-
-      juegosg += item.juegospareja1;
-      juegosp += item.juegospareja2;
-      partidog += item.gana1;
-      partidop += item.gana2;
+      partidoed += item.gana1 === item.gana2 ? 1 : 0;
     }
     if (item.idjugadordrive2 === idjugador) {
+      partidog += item.gana2;
+      partidop += item.gana1;
+      partidoe += item.gana1 === item.gana2 ? 1 : 0;
+      juegosg += item.juegospareja2;
+      juegosp += item.juegospareja1;
+
       juegosgd += item.juegospareja2;
       juegospd += item.juegospareja1;
       partidogd += item.gana2;
       partidopd += item.gana1;
-
-      juegosg += item.juegospareja2;
-      juegosp += item.juegospareja1;
-      partidog += item.gana2;
-      partidop += item.gana1;
+      partidoed += item.gana1 === item.gana2 ? 1 : 0;
     }
     if (item.idjugadorreves1 === idjugador) {
+      partidog += item.gana1;
+      partidop += item.gana2;
+      partidoe += item.gana1 === item.gana2 ? 1 : 0;
+      juegosg += item.juegospareja1;
+      juegosp += item.juegospareja2;
       juegosgr += item.juegospareja1;
       juegospr += item.juegospareja2;
       partidogr += item.gana1;
       partidopr += item.gana2;
-
-      juegosg += item.juegospareja1;
-      juegosp += item.juegospareja2;
-      partidog += item.gana1;
-      partidop += item.gana2;
+      partidoer += item.gana1 === item.gana2 ? 1 : 0;
     }
     if (item.idjugadorreves2 === idjugador) {
+      partidog += item.gana2;
+      partidop += item.gana1;
+      partidoe += item.gana1 === item.gana2 ? 1 : 0;
+      juegosg += item.juegospareja2;
+      juegosp += item.juegospareja1;
       juegosgr += item.juegospareja2;
       juegospr += item.juegospareja1;
       partidogr += item.gana2;
       partidopr += item.gana1;
-
-      juegosg += item.juegospareja2;
-      juegosp += item.juegospareja1;
-      partidog += item.gana2;
-      partidop += item.gana1;
+      partidoer += item.gana1 === item.gana2 ? 1 : 0;
     }
   });
 
@@ -129,6 +138,7 @@ function ResultadosByJugador(lstparxmar, idjugador) {
     juegosp,
     partidog,
     partidop,
+    partidoe,
     juegosgd,
     juegosgr,
     juegospd,
@@ -137,6 +147,8 @@ function ResultadosByJugador(lstparxmar, idjugador) {
     partidogr,
     partidopd,
     partidopr,
+    partidoed,
+    partidoer,
   };
 }
 
@@ -154,7 +166,7 @@ exports.GetInfomeByPartido = async (idpartido, turnos) => {
   case when pm.juegospareja1 >  pm.juegospareja2 then 1 else 0 end gana1,
   case when pm.juegospareja2 >  pm.juegospareja1 then 1 else 0 end gana2
   from partidoxpistaxjugador pp
-  left join partidoxpistaxmarcador pm on pp.id = pm.idpartidoxpista 
+  inner join partidoxpistaxmarcador pm on pp.id = pm.idpartidoxpista 
   where 
   pp.idpartido = ?
   order by pp.idturno , pp.idpista , pm.idset `;
@@ -174,7 +186,10 @@ exports.GetInfomeByPartido = async (idpartido, turnos) => {
     const reves = VecesjugoComo(lstparxmar, enumPosicion.reves, idjugador);
     const resultadosGugador = ResultadosByJugador(lstparxmar, idjugador);
     // Obtener partidos... que pasa si empatan!!! contemplar empates!!!!
-    const partidos = resultadosGugador.partidog + resultadosGugador.partidop;
+    const partidos =
+      resultadosGugador.partidog +
+      resultadosGugador.partidop +
+      resultadosGugador.partidoe;
     let itemSal = { idjugador, idpartido, partidos, drive, reves };
     lstSalida.push({ ...itemSal, ...resultadosGugador });
   });

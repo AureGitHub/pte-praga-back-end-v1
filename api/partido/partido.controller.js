@@ -168,11 +168,15 @@ const RecalcularCoeficiente = async function(trx) {
   let jugadoresxcoeficiente = [];
 
   lstResultados.forEach(jugador => {
+    // partidos Ganados / partidos jugados X 10
     let coeficiente =
       (parseInt(jugador.partidog) / parseInt(jugador.partidos)) * 10;
+    // suma/resta 0.1 por diferiencia total de juegos
     coeficiente +=
       0.1 * (parseInt(jugador.juegosg) - parseInt(jugador.juegosp));
     jugadoresxcoeficiente.push({ idjugador: jugador.idjugador, coeficiente });
+    // suma 0.2 por "fidelidad" (partidos jugados)
+    coeficiente += 0.1 * jugador.partidos;
   });
 
   // borrar le ranking
