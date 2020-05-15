@@ -170,11 +170,11 @@ exports.GetInfomeByPartido = async (idpartido, turnos) => {
   let lstSalida = [];
 
   jugxpar.forEach(idjugador => {
-    const partidos = turnos;
-
     const drive = VecesjugoComo(lstparxmar, enumPosicion.drive, idjugador);
     const reves = VecesjugoComo(lstparxmar, enumPosicion.reves, idjugador);
     const resultadosGugador = ResultadosByJugador(lstparxmar, idjugador);
+    // Obtener partidos... que pasa si empatan!!! contemplar empates!!!!
+    const partidos = resultadosGugador.partidog + resultadosGugador.partidop;
     let itemSal = { idjugador, idpartido, partidos, drive, reves };
     lstSalida.push({ ...itemSal, ...resultadosGugador });
   });

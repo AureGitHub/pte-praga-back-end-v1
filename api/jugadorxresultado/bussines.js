@@ -1,8 +1,18 @@
 const { genericController } = require('../../database/generic.controller');
 const tablename = 'jugadorxresultado';
 
-exports.getAll = async function() {
-  return genericController.getAll(tablename, '*');
+exports.getAll = async function(trx) {
+  const sql = `
+  select 
+idjugador,
+sum(partidos) partidos,
+sum(partidog) partidog,
+sum(partidop) partidop,
+sum(juegosg) juegosg,
+sum(juegosp) juegosp
+from jugadorxresultado jr 
+group by idjugador  `;
+  return genericController.getAllquery(sql, null, trx);
 };
 
 exports.getAllByIdpartido = async idpartido => {

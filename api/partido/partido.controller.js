@@ -151,19 +151,43 @@ exports.abrirOne = async ctx => {
   ctx.body = { data };
 };
 
+function compare(a, b) {
+  if (a.coeficiente < b.coeficiente) return 1;
+  if (b.coeficiente < a.coeficiente) return -1;
+
+  return 0;
+}
+
 const RecalcularCoeficiente = async function(trx) {
   // me tengo que currar la query para que me lo de agrupado por jugador
-  const lstResultados = await juxre.getAll();
+  const lstResultados = await juxre.getAll(trx);
 
   // para cada jugador, calcular su ranking
   // (pg / pj ) * 10  +  0,1 * (jg - gp)
 
-  lstResultados.forEach(item => {});
+  let jugadoresxcoeficiente = [];
+
+  lstResultados.forEach(jugador => {
+    let coeficiente =
+      (parseInt(jugador.partidog) / parseInt(jugador.partidos)) * 10;
+    coeficiente +=
+      0.1 * (parseInt(jugador.juegosg) - parseInt(jugador.juegosp));
+    jugadoresxcoeficiente.push({ idjugador: jugador.idjugador, coeficiente });
+  });
 
   // borrar le ranking
-  juxra.deleteAll(trx);
+  await juxra.deleteAll(trx);
   // ordenar la lista desc según coeficiente
   // insertar en ese orden incrementando la posicion (empezando en 1)
+
+  jugadoresxcoeficiente.sort(compare);
+
+  for (var index = 0; index < jugadoresxcoeficiente.length; index++) {
+    const posicion = index + 1;
+    const { idjugador, coeficiente } = jugadoresxcoeficiente[index];
+    const item = { idjugador, coeficiente, posicion };
+    await juxra.createOne(item, trx);
+  }
 };
 
 exports.finalizaOne = async ctx => {
@@ -183,7 +207,7 @@ exports.finalizaOne = async ctx => {
     for (var index = 0; index < jugadorxmarcador.length; index++) {
       await juxre.createOne(jugadorxmarcador[index], trx);
     }
-    RecalcularCoeficiente(trx);
+    await RecalcularCoeficiente(trx);
   });
   partido = await busOwn.getOne(id);
   ctx.status = statusOKSave;
@@ -198,6 +222,7 @@ exports.desfinalizaOne = async ctx => {
     const toUpdate = { idpartido_estado: enumPartidoEstado.cerrado };
     await busOwn.updateOne({ id }, toUpdate);
     await juxre.delByWhere({ idpartido: id }, trx);
+    await RecalcularCoeficiente(trx);
   });
 
   const partido = await busOwn.getOne(id);

@@ -119,12 +119,13 @@ exports.genericController = {
     return data[0] ? data[0] : null;
   },
 
-  getAllquery: async function(sql, parmans) {
+  getAllquery: async function(sql, parmans, trx = null) {
     let data = null;
+    const acceso = trx || db;
     if (parmans) {
-      data = await db.raw(sql, parmans);
+      data = await acceso.raw(sql, parmans);
     } else {
-      data = await db.raw(sql);
+      data = await acceso.raw(sql);
     }
     return data.rows;
   },
