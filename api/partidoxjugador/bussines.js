@@ -26,10 +26,12 @@ exports.getAllByIdpartido = async function(idpartido) {
   j.alias,  
   j.idposicion,
   pos.descripcion posicion,
-  pj.idpartidoxjugador_estado
+  pj.idpartidoxjugador_estado,
+  jr.posicion posicionRanking
   from partidoxjugador pj
   inner join jugador j on pj.idjugador = j.id    
   inner join  posicion pos on j.idposicion = pos.id
+  left join jugadorxranking jr on j.id = jr.idjugador
   where idpartido=?
   order by pj.created_at`;
   return genericController.getAllquery(sql, [idpartido]);

@@ -7,6 +7,10 @@ module.exports = Router => {
 
   router.get('/:idpartido', controller.getAllByIdpartido);
   router.get('/ParejasAleatorio/:idpartido', controller.CreateParejasAleatorio);
+  router.get(
+    '/ParejasPorRanking/:idpartido',
+    controller.CreateParejasPorRanking,
+  );
 
   return router;
 };

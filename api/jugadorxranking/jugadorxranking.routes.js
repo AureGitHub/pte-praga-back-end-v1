@@ -5,7 +5,7 @@ const prefix = `/jugadorxranking`;
 module.exports = Router => {
   const router = new Router({ prefix });
 
-  router.get('/:idpartido', controller.getAll);
+  router.get('/', controller.getAll);
 
   return router;
 };

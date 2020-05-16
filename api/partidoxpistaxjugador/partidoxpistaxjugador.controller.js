@@ -37,7 +37,7 @@ function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function HacerParejas(lstdrivers, lstreves, pistas) {
+function ParejasAleatorio(lstdrivers, lstreves) {
   let numPar = 0;
   let parejas = [];
   let idjugadorNeg = -1; // para simular jugadores cuando hay huecos
@@ -74,9 +74,81 @@ function HacerParejas(lstdrivers, lstreves, pistas) {
       reves: reves ? reves.id : idjugadorNeg--,
     });
   }
+  return parejas;
+}
+
+function compare(a, b) {
+  if (a.posicionranking > b.posicionranking) return 1;
+  if (b.posicionranking > a.posicionranking) return -1;
+
+  return 0;
+}
+
+function ParejasByRanking(lstdrivers, lstreves) {
+  // si no están en el ranking los mando a la última posicion
+  lstdrivers.forEach(item => {
+    if (!item.posicionranking) {
+      item.posicionranking = 100;
+    }
+  });
+
+  lstreves.forEach(item => {
+    if (!item.posicionranking) {
+      item.posicionranking = 100;
+    }
+  });
+  lstdrivers.sort(compare);
+  lstreves.sort(compare);
+
+  let numPar = 0;
+  let parejas = [];
+  let idjugadorNeg = -1; // para simular jugadores cuando hay huecos
+  while (lstdrivers.length > 0 || lstreves.length > 0) {
+    let drive = null;
+    let reves = null;
+    // busco el drive
+    if (lstdrivers.length > 0) {
+      const indexDrive = 0; // el de mayor ranking
+      drive = lstdrivers[indexDrive];
+      lstdrivers.splice(indexDrive, 1);
+    } else if (lstreves.length > 0) {
+      const indexReves = 0; // el de mayor ranking
+      drive = lstreves[indexReves];
+      lstreves.splice(indexReves, 1);
+    }
+
+    // busco el reves
+
+    if (lstreves.length > 0) {
+      const indexReves = lstreves.length - 1;
+      reves = lstreves[indexReves];
+      lstreves.splice(indexReves, 1);
+    } else if (lstdrivers.length > 0) {
+      const indexDrive = lstdrivers.length - 1;
+      reves = lstdrivers[indexDrive];
+      lstdrivers.splice(indexDrive, 1);
+    }
+
+    numPar++;
+    parejas.push({
+      numPar,
+      drive: drive ? drive.id : idjugadorNeg--,
+      reves: reves ? reves.id : idjugadorNeg--,
+    });
+  }
+  return parejas;
+}
+
+function HacerParejas(lstdrivers, lstreves, pistas, tipo) {
+  let parejas = [];
+  if (tipo === 1) {
+    parejas = ParejasAleatorio(lstdrivers, lstreves);
+  } else if (tipo === 2) {
+    parejas = ParejasByRanking(lstdrivers, lstreves);
+  }
 
   // tengo que completar las parejas necesarias..
-
+  let idjugadorNeg = -1;
   for (var index = parejas.length; index < pistas * 2; index++) {
     parejas.push({
       numPar: index + 1,
@@ -84,7 +156,6 @@ function HacerParejas(lstdrivers, lstreves, pistas) {
       reves: idjugadorNeg--,
     });
   }
-
   let pairs = [];
 
   for (var i = 0; i < parejas.length; i++) {
@@ -106,7 +177,6 @@ function HacerParejas(lstdrivers, lstreves, pistas) {
       }
     }
   }
-
   return pairs;
 }
 
@@ -149,11 +219,22 @@ function HacerDistribucion(ctx, turnos, pistas, parejas) {
   return distribucionTurnoPista;
 }
 
+// victor's button
+exports.CreateParejasPorRanking = async ctx => {
+  await CreateParejas(ctx, 2);
+};
+
 exports.CreateParejasAleatorio = async ctx => {
+  await CreateParejas(ctx, 1);
+};
+
+/// tipo = 1 Aleatoria ; 2 Por ranking
+var CreateParejas = async (ctx, tipo) => {
   const { idpartido } = ctx.params;
   assertKOParams(ctx, idpartido, 'idpartido');
 
   let jugadores = await buspaxju.getAllByIdpartido(idpartido);
+  assertKOParams(ctx, jugadores.length, 'No hay jugadores');
   const partido = await buspar.getOne(idpartido);
   const { pistas, turnos } = partido;
 
@@ -169,7 +250,7 @@ exports.CreateParejasAleatorio = async ctx => {
       a.idposicion === enumPosicion.reves,
   );
 
-  const parejas = HacerParejas(lstdrivers, lstreves, pistas);
+  const parejas = HacerParejas(lstdrivers, lstreves, pistas, tipo);
   const distribucionTurnoPista = HacerDistribucion(
     ctx,
     turnos,
