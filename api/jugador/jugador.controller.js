@@ -19,6 +19,15 @@ const {
   assertKOParams,
 } = require('../../utils/error.util');
 
+exports.getResumenPartidos = async ctx => {
+  const { userInToken } = ctx.state;
+  assertKOParams(ctx, userInToken, 'No hay usuario conectado');
+  assertKOParams(ctx, userInToken.id, 'No hay usuario conectado');
+  const data = await busOwn.getResumenPartidos(userInToken.id);
+  ctx.status = statusOKquery;
+  ctx.body = { data };
+};
+
 exports.getAll = async ctx => {
   const { userInToken } = ctx.state;
   ctx.assert(

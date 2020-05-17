@@ -8,6 +8,7 @@ module.exports = Router => {
 
   router
     .get('/', controller.getAll)
+    .get('/ResumenPartidos', controller.getResumenPartidos)
     .get('/:id', controller.getOne)
     .post('/', controller.createOne)
     .post('/public', controller.createOne)
