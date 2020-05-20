@@ -41,3 +41,8 @@ exports.createOne = async function createOne(item, trx = null) {
 exports.deleteAll = async function(trx) {
   return genericController.deleteAll(tablename, trx);
 };
+
+exports.getOne = async function(idjugador) {
+  let data = await genericController.getOne(tablename, '*', { idjugador });
+  return data;
+};

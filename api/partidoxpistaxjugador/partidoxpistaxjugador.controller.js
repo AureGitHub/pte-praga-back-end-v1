@@ -84,7 +84,7 @@ function compare(a, b) {
   return 0;
 }
 
-function ParejasByRanking(lstdrivers, lstreves) {
+function ParejasByRanking(lstdrivers, lstreves, pistas) {
   // si no están en el ranking los mando a la última posicion
   lstdrivers.forEach(item => {
     if (!item.posicionranking) {
@@ -97,46 +97,110 @@ function ParejasByRanking(lstdrivers, lstreves) {
       item.posicionranking = 100;
     }
   });
+
+  const TotalJugadoresNecesarios = pistas * 4;
+  const TotalPorPos = pistas * 2;
+  const TotalJugadoresDisponibles = lstdrivers.length + lstreves.length;
+
+  let idjugadorNeg = -1; // para simular jugadores cuando hay huecos
+
+  if (TotalJugadoresDisponibles < TotalJugadoresNecesarios) {
+    // añado tantos jugadores FICTICIO como necesite
+    for (
+      var index = TotalJugadoresDisponibles;
+      index < TotalJugadoresNecesarios;
+      index++
+    ) {
+      if (index % 2) {
+        if (lstdrivers.length < TotalPorPos) {
+          lstdrivers.push({ id: idjugadorNeg--, posicionranking: 100 });
+        } else if (lstreves.length < TotalPorPos) {
+          lstreves.push({ id: idjugadorNeg--, posicionranking: 100 });
+        }
+      } else {
+        if (lstreves.length < TotalPorPos) {
+          lstreves.push({ id: idjugadorNeg--, posicionranking: 100 });
+        } else if (lstdrivers.length < TotalPorPos) {
+          lstdrivers.push({ id: idjugadorNeg--, posicionranking: 100 });
+        }
+      }
+    }
+  }
+
   lstdrivers.sort(compare);
   lstreves.sort(compare);
+  // al llegar aqui ya tengo que tener tantos jugadores como necesite
 
+  if (lstdrivers.length > TotalPorPos) {
+    // tengo mas drives de los necesarios... paso los de menos coef al reves
+    const totalDrives = lstdrivers.length;
+    for (let index = TotalPorPos; index < totalDrives; index++) {
+      const indexDrive = lstdrivers.length - 1; // el peor
+      lstreves.push(lstdrivers[indexDrive]);
+      lstdrivers.splice(indexDrive, 1);
+    }
+  } else if (lstreves.length > TotalPorPos) {
+    // tengo mas reves de los necesarios... paso los de menos coef al drive
+    const totalReves = lstreves.length;
+    for (let index = TotalPorPos; index < totalReves; index++) {
+      const indexReves = lstreves.length - 1; // el peor
+      lstdrivers.push(lstreves[indexReves]);
+      lstreves.splice(indexReves, 1);
+    }
+  }
+
+  // al llegar aqui, tengo los mismo reves que drives
+  // Uno los últimos de una lista con los primeros de la otra
   let numPar = 0;
   let parejas = [];
-  let idjugadorNeg = -1; // para simular jugadores cuando hay huecos
-  while (lstdrivers.length > 0 || lstreves.length > 0) {
-    let drive = null;
-    let reves = null;
-    // busco el drive
-    if (lstdrivers.length > 0) {
-      const indexDrive = 0; // el de mayor ranking
-      drive = lstdrivers[indexDrive];
-      lstdrivers.splice(indexDrive, 1);
-    } else if (lstreves.length > 0) {
-      const indexReves = 0; // el de mayor ranking
-      drive = lstreves[indexReves];
-      lstreves.splice(indexReves, 1);
-    }
-
-    // busco el reves
-
-    if (lstreves.length > 0) {
-      const indexReves = lstreves.length - 1;
-      reves = lstreves[indexReves];
-      lstreves.splice(indexReves, 1);
-    } else if (lstdrivers.length > 0) {
-      const indexDrive = lstdrivers.length - 1;
-      reves = lstdrivers[indexDrive];
-      lstdrivers.splice(indexDrive, 1);
-    }
-
+  for (let index = 0; index < lstdrivers.length; index++) {
     numPar++;
     parejas.push({
       numPar,
-      drive: drive ? drive.id : idjugadorNeg--,
-      reves: reves ? reves.id : idjugadorNeg--,
+      drive: lstdrivers[index].id,
+      reves: lstreves[lstreves.length - 1 - index].id,
     });
   }
+
   return parejas;
+
+  // let numPar = 0;
+  // let parejas = [];
+
+  // while (lstdrivers.length > 0 || lstreves.length > 0) {
+  //   let drive = null;
+  //   let reves = null;
+  //   // busco el drive
+  //   if (lstdrivers.length > 0) {
+  //     const indexDrive = 0; // el de mayor ranking
+  //     drive = lstdrivers[indexDrive];
+  //     lstdrivers.splice(indexDrive, 1);
+  //   } else if (lstreves.length > 0) {
+  //     const indexReves = 0; // el de mayor ranking
+  //     drive = lstreves[indexReves];
+  //     lstreves.splice(indexReves, 1);
+  //   }
+
+  //   // busco el reves
+
+  //   if (lstreves.length > 0) {
+  //     const indexReves = lstreves.length - 1;
+  //     reves = lstreves[indexReves];
+  //     lstreves.splice(indexReves, 1);
+  //   } else if (lstdrivers.length > 0) {
+  //     const indexDrive = lstdrivers.length - 1;
+  //     reves = lstdrivers[indexDrive];
+  //     lstdrivers.splice(indexDrive, 1);
+  //   }
+
+  //   numPar++;
+  //   parejas.push({
+  //     numPar,
+  //     drive: drive ? drive.id : idjugadorNeg--,
+  //     reves: reves ? reves.id : idjugadorNeg--,
+  //   });
+  // }
+  // return parejas;
 }
 
 function HacerParejas(lstdrivers, lstreves, pistas, tipo) {
@@ -144,7 +208,7 @@ function HacerParejas(lstdrivers, lstreves, pistas, tipo) {
   if (tipo === 1) {
     parejas = ParejasAleatorio(lstdrivers, lstreves);
   } else if (tipo === 2) {
-    parejas = ParejasByRanking(lstdrivers, lstreves);
+    parejas = ParejasByRanking(lstdrivers, lstreves, pistas);
   }
 
   // tengo que completar las parejas necesarias..

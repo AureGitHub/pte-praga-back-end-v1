@@ -28,6 +28,20 @@ exports.getResumenPartidos = async ctx => {
   ctx.body = { data };
 };
 
+exports.getResumenEstadisticas = async ctx => {
+  const { userInToken } = ctx.state;
+  assertKOParams(ctx, userInToken, 'No hay usuario conectado');
+  assertKOParams(ctx, userInToken.id, 'No hay usuario conectado');
+  let data = await busOwn.getResumenEstadisticas(userInToken.id);
+
+  for (const prop in data[0]) {
+    data[0][prop] = parseInt(data[0][prop]);
+  }
+
+  ctx.status = statusOKquery;
+  ctx.body = { data };
+};
+
 exports.getAll = async ctx => {
   const { userInToken } = ctx.state;
   ctx.assert(

@@ -43,6 +43,32 @@ exports.getResumenPartidos = async function(idjugador) {
   ]);
 };
 
+exports.getResumenEstadisticas = async function(idjugador) {
+  const sql = `  
+  select 
+  idjugador,
+  sum(partidos) partidos,
+  sum(partidog) partidog,
+  sum(partidop) partidop,
+  sum(partidoe) partidoe,
+  sum(juegosg) juegosg,
+  sum(juegosp) juegosp,
+  sum(partidogd) partidogd,
+  sum(partidopd) partidopd,
+  sum(partidoed) partidoed,
+  sum(partidogr) partidogr,
+  sum(partidopr) partidopr,
+  sum(partidoer) partidoer,
+  sum(juegosgd) juegosgd,
+  sum(juegospd) juegospd,
+  sum(juegosgr) juegosgr,
+  sum(juegospr) juegospr
+  from jugadorxresultado jr 
+  where idjugador =?
+  group by idjugador `;
+  return genericController.getAllquery(sql, idjugador);
+};
+
 exports.getOne = async function(id) {
   let dbUser = await genericController.getOne(tablename, '*', { id });
   dbUser.IsAdmin = dbUser.idperfil === enumPerfil.admin;
