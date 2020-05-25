@@ -42,6 +42,15 @@ exports.getResumenEstadisticas = async ctx => {
   ctx.body = { data };
 };
 
+exports.getResumenparejas = async ctx => {
+  const { userInToken } = ctx.state;
+  assertKOParams(ctx, userInToken, 'No hay usuario conectado');
+  assertKOParams(ctx, userInToken.id, 'No hay usuario conectado');
+  let data = await busOwn.getResumenparejas(userInToken.id);
+  ctx.status = statusOKquery;
+  ctx.body = { data };
+};
+
 exports.getAll = async ctx => {
   const { userInToken } = ctx.state;
   ctx.assert(

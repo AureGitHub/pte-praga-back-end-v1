@@ -69,6 +69,45 @@ exports.getResumenEstadisticas = async function(idjugador) {
   return genericController.getAllquery(sql, idjugador);
 };
 
+exports.getResumenparejas = async function(idjugador) {
+  const sql = `  
+  select alias, count(*) total
+from jugador ju inner join
+(select 
+ppj.idjugadordrive1 idpareja
+from partido pa
+inner join partidoxpistaxjugador ppj on pa.id = ppj.idpartido  
+where pa.idpartido_estado = 3 and (ppj.idjugadorreves1 = ?)
+union all
+select  
+ppj.idjugadordrive2 idpareja
+from partido pa
+inner join partidoxpistaxjugador ppj on pa.id = ppj.idpartido  
+where pa.idpartido_estado = 3 and (ppj.idjugadorreves2 = ?)
+union all
+select 
+ppj.idjugadorreves1   idpareja
+from partido pa
+inner join partidoxpistaxjugador ppj on pa.id = ppj.idpartido  
+where pa.idpartido_estado = 3 and (ppj.idjugadordrive1 = ?)
+union all
+select 
+ppj.idjugadorreves2   idpareja
+from partido pa
+inner join partidoxpistaxjugador ppj on pa.id = ppj.idpartido  
+where pa.idpartido_estado = 3 and (ppj.idjugadordrive2 = ?)
+) SusParejas on ju.id = SusParejas.idpareja
+group by ju.alias  `;
+  return genericController.getAllquery(sql, [
+    idjugador,
+    idjugador,
+    idjugador,
+    idjugador,
+  ]);
+};
+
+
+
 exports.getOne = async function(id) {
   let dbUser = await genericController.getOne(tablename, '*', { id });
   dbUser.IsAdmin = dbUser.idperfil === enumPerfil.admin;

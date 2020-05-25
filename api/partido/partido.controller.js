@@ -109,11 +109,11 @@ exports.updateOne = async function updateOne(ctx) {
 
   partido.jugadorestotal = parseInt(partido.pistas) * 4;
   await db.transaction(async function(trx) {
-    await buspaxpixma.delByWhere({ idpartido: id }, trx);
-    await buspaxpi.delByWhere({ idpartido: id }, trx);
     await buspaxju.GestionSuplentes(oldPartido, partido, trx);
     await busOwn.updateOne({ id: partido.id }, partido);
     if (oldPartido.pistas !== pistas || oldPartido.turnos !== turnos) {
+      await buspaxpixma.delByWhere({ idpartido: id }, trx);
+      await buspaxpi.delByWhere({ idpartido: id }, trx);
       await buspaxpi.CreatePistas(partido.id, pistas, turnos, trx);
     }
   });
