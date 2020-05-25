@@ -1,9 +1,5 @@
 // const db = require('../../database');
-const {
-  statusOKquery,
-  assertNoData,
-  assertKOParams,
-} = require('../../utils/error.util');
+const { statusOKquery, assertKOParams } = require('../../utils/error.util');
 const busOwen = require('./bussines');
 
 exports.getAll = async ctx => {
@@ -18,7 +14,6 @@ exports.getOne = async function getOne(ctx) {
   ctx.assert(userInToken.id === id, 401, 'Solo puede consultar su ranking');
   assertKOParams(ctx, id, 'id');
   const data = await busOwen.getOne(id);
-  assertNoData(ctx, data);
   ctx.status = statusOKquery;
   ctx.body = { data };
 };
