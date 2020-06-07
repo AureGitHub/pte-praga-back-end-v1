@@ -6,7 +6,7 @@ exports.getAll = async idpartido => {
   select 
   posicion ,
   alias,
-  coeficiente ,
+  round( CAST(coeficiente as numeric), 4) coeficiente,
   partidos,
   partidosG,
   DiffJuegos
