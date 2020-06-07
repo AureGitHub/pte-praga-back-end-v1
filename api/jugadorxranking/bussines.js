@@ -43,6 +43,15 @@ exports.deleteAll = async function(trx) {
 };
 
 exports.getOne = async function(idjugador) {
-  let data = await genericController.getOne(tablename, '*', { idjugador });
+
+  const sql = `
+  select 
+  posicion ,
+   round( CAST(coeficiente as numeric), 4) coeficiente
+  from jugadorxranking jr
+  where idjugador=?
+  `;
+
+  let data = await genericController.getOnequery(sql, idjugador);
   return data;
 };
