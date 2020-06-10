@@ -27,7 +27,12 @@ exports.getAllByIdpartido = async function(idpartido) {
   j.idposicion,
   pos.descripcion posicion,
   pj.idpartidoxjugador_estado,
-  jr.posicion posicionRanking
+  jr.posicion posicionRanking,
+  CASE WHEN jr.coeficiente IS NULL 
+            THEN cast (-10 as numeric)
+            else  cast (round( CAST(jr.coeficiente as numeric), 3) as numeric)
+    END AS coeficiente,
+    pj.created_at
   from partidoxjugador pj
   inner join jugador j on pj.idjugador = j.id    
   inner join  posicion pos on j.idposicion = pos.id
