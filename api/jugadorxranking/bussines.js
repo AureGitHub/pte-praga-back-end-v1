@@ -28,7 +28,7 @@ exports.getAll = async idpartido => {
   from jugadorxresultado j
   group by idjugador 
   )Marcador on Coeficiente.idjugador = Marcador.idjugador
-  order by coeficiente desc  
+  order by posicion 
   `;
   return genericController.getAllquery(sql);
 };
@@ -43,7 +43,6 @@ exports.deleteAll = async function(trx) {
 };
 
 exports.getOne = async function(idjugador) {
-
   const sql = `
   select 
   posicion ,
