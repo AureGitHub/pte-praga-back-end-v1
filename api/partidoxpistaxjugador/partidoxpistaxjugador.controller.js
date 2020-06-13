@@ -224,10 +224,10 @@ function HacerParejas(lstdrivers, lstreves, pistas, tipo) {
 
   for (var i = 0; i < parejas.length; i++) {
     for (var j = 0; j < parejas.length; j++) {
-      if (parejas[i] !== parejas[j]) {
+      if (parejas[i].numPar !== parejas[j].numPar) {
         let x = null;
         let y = null;
-        if (parejas[i] < parejas[j]) {
+        if (parejas[i].numPar < parejas[j].numPar) {
           x = parejas[i];
           y = parejas[j];
         } else {
@@ -235,7 +235,9 @@ function HacerParejas(lstdrivers, lstreves, pistas, tipo) {
           y = parejas[i];
         }
 
-        if (!pairs.find(a => a.x === x && a.y === y)) {
+        if (
+          !pairs.find(a => a.x.numPar === x.numPar && a.y.numPar === y.numPar)
+        ) {
           pairs.push({ x, y });
         }
       }
