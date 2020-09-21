@@ -175,7 +175,7 @@ const RecalcularCoeficiente = async function(trx) {
     coeficiente +=
       0.1 * (parseInt(jugador.juegosg) - parseInt(jugador.juegosp));
 
-    // suma 0.2 por "fidelidad" (partidos jugados
+    // suma 0.2 por "fidelidad" (partidos jugados)
     coeficiente += 0.5 * jugador.partidos;
     jugadoresxcoeficiente.push({ idjugador: jugador.idjugador, coeficiente });
   });
