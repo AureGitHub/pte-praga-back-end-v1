@@ -18,7 +18,7 @@ const { isDevelopment, JWT_SECRET } = require('./config');
 
 const server = new Koa();
 
-// Aure
+// Aure 11
 
 if (isDevelopment) {
   console.log('modo desarrollo');
