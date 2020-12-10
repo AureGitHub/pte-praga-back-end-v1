@@ -4,7 +4,7 @@ const { databaseConfig } = require('../config');
 
 module.exports = knex({
   client: 'pg', // pg is the database library for postgreSQL on knexjs
-  //connection: databaseConfig.DATABASE_URL
+  connection: databaseConfig.DATABASE_URL
   // connection: {
   //   host: databaseConfig.host, // Your local host IP
   //   user: databaseConfig.user, // Your postgres user name
@@ -20,7 +20,7 @@ module.exports = knex({
   //   port: databaseConfig.port,
    
   // },
-  connection: {
-    database: databaseConfig.DATABASE_URL,
-  },
+  // connection: {
+  //   database: databaseConfig.DATABASE_URL,
+  // },
 });
