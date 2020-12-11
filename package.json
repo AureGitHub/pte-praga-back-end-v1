@@ -44,7 +44,7 @@
     "dotenv": "8.0.0",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.5.1",
-    "knex": "^0.20.13",
+    "knex": "^0.20.15",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
     "koa-compress": "3.0.0",
@@ -53,7 +53,7 @@
     "koa-logger": "3.2.0",
     "koa-router": "7.4.0",
     "koa-static": "^5.0.0",
-    "pg": "^8.0.1",
+    "pg": "^8.5.1",
     "sendgrid": "^5.2.3",
     "uuid": "^3.3.2"
   }
